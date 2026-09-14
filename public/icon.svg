@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+    <linearGradient id="leaf" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)" />
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#34d399" stroke-width="8" stroke-dasharray="16 12" opacity="0.4" />
+  <path d="M256 120 C 330 120, 390 180, 390 256 C 390 332, 330 392, 256 392 C 182 392, 122 332, 122 256 C 122 180, 182 120, 256 120 Z" fill="none" stroke="#10b981" stroke-width="4" opacity="0.3" />
+  <!-- Sprout Leaves -->
+  <path d="M256 360 C 256 270, 280 200, 360 160 C 360 250, 320 320, 256 360 Z" fill="url(#leaf)" />
+  <path d="M256 360 C 256 280, 230 220, 160 190 C 160 270, 200 330, 256 360 Z" fill="#6ee7b7" />
+  <circle cx="256" cy="370" r="16" fill="#fbbf24" />
+</svg>

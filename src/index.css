@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+    background-color: #f4f8f6;
+  }
+  
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  /* Ensure numbers, currency, and quantities align cleanly */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* =========================================================================
+   Attractive Multi-Palette Market Canvas Themes
+   ========================================================================= */
+
+/* 1. Fresh Farm Emerald (Default) - Crisp agri-green, sunlit gold & mint ambient glow */
+.theme-emerald,
+body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-midnight) {
+  background-color: #f3f8f5;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.14) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.12) 0px, transparent 45%),
+    radial-gradient(at 50% 35%, rgba(5, 150, 105, 0.05) 0px, transparent 60%),
+    radial-gradient(at 85% 100%, rgba(14, 165, 233, 0.06) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.09) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* 2. Golden Harvest - Warm amber sunrise tones of traditional South Indian markets */
+.theme-golden {
+  background-color: #faf6ee;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.16) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(234, 88, 12, 0.12) 0px, transparent 45%),
+    radial-gradient(at 50% 40%, rgba(251, 191, 36, 0.07) 0px, transparent 60%),
+    radial-gradient(at 85% 100%, rgba(16, 185, 129, 0.07) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* 3. Ocean Mist - Soothing Nilgiri mountain breeze teal & aqua */
+.theme-ocean {
+  background-color: #f0f7f9;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(20, 184, 166, 0.13) 0px, transparent 45%),
+    radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.06) 0px, transparent 60%);
+  background-attachment: fixed;
+}
+
+/* 4. Midnight Bazaar - Premium dark luxury night market aesthetic */
+.theme-midnight {
+  background-color: #0a111c;
+  background-image: 
+    radial-gradient(at 5% 5%, rgba(16, 185, 129, 0.18) 0px, transparent 50%),
+    radial-gradient(at 95% 5%, rgba(245, 158, 11, 0.14) 0px, transparent 45%),
+    radial-gradient(at 50% 85%, rgba(14, 165, 233, 0.12) 0px, transparent 60%);
+  background-attachment: fixed;
+  color: #f1f5f9;
+}
+
+.theme-midnight .bg-white {
+  background-color: #121c2b !important;
+  color: #f8fafc !important;
+  border-color: #243447 !important;
+}
+
+.theme-midnight .bg-slate-50\/70,
+.theme-midnight .bg-slate-50\/80,
+.theme-midnight .bg-slate-100\/80,
+.theme-midnight .bg-slate-100\/90 {
+  background-color: #172436 !important;
+  border-color: #243447 !important;
+}
+
+.theme-midnight .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+.theme-midnight .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+
+.theme-midnight .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+.theme-midnight .text-slate-600,
+.theme-midnight .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+.theme-midnight .bg-slate-900 {
+  background-color: #060c14 !important;
+}
+
+/* Polished micro-interactions & custom scrollbars */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+}
+
+.card-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-sheen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  pointer-events: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Outdoor Sunlight High-Contrast Mode for bright open-air vegetable mandis */
+.outdoor-mode {
+  filter: contrast(1.12);
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.outdoor-mode .bg-white {
+  background-color: #ffffff !important;
+  border-color: #334155 !important;
+}
+
+.outdoor-mode .text-slate-500,
+.outdoor-mode .text-slate-400 {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+}
+
+/* Print thermal receipt styles */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+}

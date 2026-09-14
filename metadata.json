@@ -1,0 +1,6 @@
+{
+  "name": "SanthAI",
+  "description": "Low-literacy, WhatsApp-first daily assistant for produce market vendors in India — forecasting stock, tracking mandi prices, managing surplus rescue, and digital khata credit.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
