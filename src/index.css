@@ -2,82 +2,124 @@
 
 @layer base {
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Noto Sans Tamil', system-ui, -apple-system, sans-serif;
     color: #0f172a;
-    background-color: #f4f8f6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   
   h1, h2, h3, h4, .font-heading {
-    font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Outfit', 'Noto Sans Tamil', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.02em;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  /* Ensure numbers, currency, and quantities align cleanly */
-  .tabular-nums {
+  .font-display {
+    font-family: 'Plus Jakarta Sans', 'Outfit', 'Noto Sans Tamil', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.025em;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Numbers, currency, and quantities with tabular spacing */
+  .tabular-nums, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
     font-variant-numeric: tabular-nums;
   }
 }
 
 /* =========================================================================
-   Attractive Multi-Palette Market Canvas Themes
+   Rich, Attractive Multi-Palette Market Canvas Themes
    ========================================================================= */
 
-/* 1. Fresh Farm Emerald (Default) - Crisp agri-green, sunlit gold & mint ambient glow */
+/* 1. Fresh Farm Emerald (Default) - Matching uploaded reference screenshot palette */
 .theme-emerald,
-body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-midnight) {
-  background-color: #f3f8f5;
+body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):not(.theme-amethyst):not(.theme-midnight) {
+  background-color: #f3f6f2;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.14) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.12) 0px, transparent 45%),
-    radial-gradient(at 50% 35%, rgba(5, 150, 105, 0.05) 0px, transparent 60%),
-    radial-gradient(at 85% 100%, rgba(14, 165, 233, 0.06) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.09) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(24, 58, 39, 0.05) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(22, 163, 74, 0.06) 0px, transparent 50%),
+    radial-gradient(at 50% 30%, rgba(232, 245, 236, 0.5) 0px, transparent 65%),
+    radial-gradient(at 85% 90%, rgba(245, 158, 11, 0.04) 0px, transparent 55%);
   background-attachment: fixed;
 }
 
-/* 2. Golden Harvest - Warm amber sunrise tones of traditional South Indian markets */
+/* 2. Golden Harvest - Warm radiant saffron amber, marigold gold, and festive harvest glow */
 .theme-golden {
-  background-color: #faf6ee;
+  background-color: #fcf6ea;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.16) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(234, 88, 12, 0.12) 0px, transparent 45%),
-    radial-gradient(at 50% 40%, rgba(251, 191, 36, 0.07) 0px, transparent 60%),
-    radial-gradient(at 85% 100%, rgba(16, 185, 129, 0.07) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.32) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(234, 88, 12, 0.26) 0px, transparent 50%),
+    radial-gradient(at 50% 35%, rgba(251, 191, 36, 0.22) 0px, transparent 65%),
+    radial-gradient(at 85% 90%, rgba(217, 119, 6, 0.20) 0px, transparent 55%),
+    radial-gradient(at 10% 85%, rgba(16, 185, 129, 0.16) 0px, transparent 50%);
   background-attachment: fixed;
 }
 
-/* 3. Ocean Mist - Soothing Nilgiri mountain breeze teal & aqua */
+/* 3. Ocean Mist - Soothing Nilgiri mountain breeze, turquoise azure & cool sapphire */
 .theme-ocean {
-  background-color: #f0f7f9;
+  background-color: #edf7fa;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(20, 184, 166, 0.13) 0px, transparent 45%),
-    radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.06) 0px, transparent 60%);
+    radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.30) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(20, 184, 166, 0.28) 0px, transparent 50%),
+    radial-gradient(at 50% 35%, rgba(99, 102, 241, 0.18) 0px, transparent 65%),
+    radial-gradient(at 85% 90%, rgba(6, 182, 212, 0.22) 0px, transparent 55%),
+    radial-gradient(at 10% 85%, rgba(16, 185, 129, 0.16) 0px, transparent 50%);
   background-attachment: fixed;
 }
 
-/* 4. Midnight Bazaar - Premium dark luxury night market aesthetic */
+/* 4. Sunset Coral - Radiant coral rose, fiery warm apricot & dusk crimson warmth */
+.theme-sunset {
+  background-color: #fdf3f2;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(244, 63, 94, 0.28) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.26) 0px, transparent 50%),
+    radial-gradient(at 50% 35%, rgba(251, 146, 60, 0.20) 0px, transparent 65%),
+    radial-gradient(at 85% 90%, rgba(168, 85, 247, 0.20) 0px, transparent 55%),
+    radial-gradient(at 10% 85%, rgba(244, 63, 94, 0.20) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* 5. Royal Amethyst - Exquisite velvet violet, lavender blossom, deep indigo & magenta glow */
+.theme-amethyst {
+  background-color: #f7f3fd;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.30) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.28) 0px, transparent 50%),
+    radial-gradient(at 50% 35%, rgba(236, 72, 153, 0.20) 0px, transparent 65%),
+    radial-gradient(at 85% 90%, rgba(139, 92, 246, 0.24) 0px, transparent 55%),
+    radial-gradient(at 10% 85%, rgba(14, 165, 233, 0.18) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* 6. Midnight Bazaar - Premium dark luxury night market aesthetic with neon bioluminescence */
 .theme-midnight {
-  background-color: #0a111c;
+  background-color: #070d18;
   background-image: 
-    radial-gradient(at 5% 5%, rgba(16, 185, 129, 0.18) 0px, transparent 50%),
-    radial-gradient(at 95% 5%, rgba(245, 158, 11, 0.14) 0px, transparent 45%),
-    radial-gradient(at 50% 85%, rgba(14, 165, 233, 0.12) 0px, transparent 60%);
+    radial-gradient(at 5% 5%, rgba(16, 185, 129, 0.28) 0px, transparent 55%),
+    radial-gradient(at 95% 5%, rgba(245, 158, 11, 0.22) 0px, transparent 50%),
+    radial-gradient(at 50% 30%, rgba(99, 102, 241, 0.22) 0px, transparent 65%),
+    radial-gradient(at 85% 85%, rgba(14, 165, 233, 0.22) 0px, transparent 60%),
+    radial-gradient(at 10% 85%, rgba(236, 72, 153, 0.18) 0px, transparent 55%);
   background-attachment: fixed;
-  color: #f1f5f9;
+  color: #f8fafc;
 }
 
+/* Midnight Dark Overrides */
 .theme-midnight .bg-white {
-  background-color: #121c2b !important;
+  background-color: #0f1927 !important;
   color: #f8fafc !important;
-  border-color: #243447 !important;
+  border-color: #1e2f44 !important;
 }
 
+.theme-midnight .bg-slate-50,
 .theme-midnight .bg-slate-50\/70,
 .theme-midnight .bg-slate-50\/80,
+.theme-midnight .bg-slate-100,
 .theme-midnight .bg-slate-100\/80,
 .theme-midnight .bg-slate-100\/90 {
-  background-color: #172436 !important;
-  border-color: #243447 !important;
+  background-color: #152234 !important;
+  border-color: #22374e !important;
 }
 
 .theme-midnight .text-slate-900 {
@@ -98,17 +140,32 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-midnight
 }
 
 .theme-midnight .bg-slate-900 {
-  background-color: #060c14 !important;
+  background-color: #050a12 !important;
 }
 
-/* Polished micro-interactions & custom scrollbars */
+/* Enhanced Frosted Glass & Surface Polish */
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+}
+
+.theme-midnight .glass-panel {
+  background-color: rgba(15, 25, 39, 0.92);
+  border-color: rgba(36, 52, 71, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+}
+
+/* Attractive Micro-Interactions & Elevation */
 .hover-lift {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 
 .hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  transform: translateY(-2.5px);
+  box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.10), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
 }
 
 .card-sheen {
@@ -123,17 +180,49 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-midnight
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
   pointer-events: none;
 }
 
+/* Attractive Expressive Gradient Text Utilities */
+.text-gradient-emerald {
+  background: linear-gradient(135deg, #047857 0%, #059669 50%, #0d9488 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #ea580c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-ocean {
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0d9488 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-sunset {
+  background: linear-gradient(135deg, #be123c 0%, #e11d48 50%, #ea580c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-amethyst {
+  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #db2777 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: rgba(241, 245, 249, 0.8);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -147,7 +236,7 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-midnight
 
 /* Outdoor Sunlight High-Contrast Mode for bright open-air vegetable mandis */
 .outdoor-mode {
-  filter: contrast(1.12);
+  filter: contrast(1.15);
   background-color: #ffffff !important;
   color: #000000 !important;
 }

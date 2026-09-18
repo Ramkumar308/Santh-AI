@@ -23,6 +23,8 @@ import { AuthService } from './services/auth';
 import { ResQService } from './services/resq';
 import { PricingEngine } from './services/pricing';
 import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+import { TopHeader } from './components/TopHeader';
 import { StockModule } from './components/StockModule';
 import { PricesModule } from './components/PricesModule';
 import { ResQModule } from './components/ResQModule';
@@ -31,6 +33,7 @@ import { VendorAuthModal } from './components/VendorAuthModal';
 import { DataVaultModal } from './components/DataVaultModal';
 import { MarketPulseTicker } from './components/MarketPulseTicker';
 import { MarketSessionBanner, MarketSession } from './components/MarketSessionBanner';
+import { ThemePaletteBar } from './components/ThemePaletteBar';
 import { SoundEffects } from './utils/audioHaptics';
 import {
   ShieldCheck,
@@ -48,7 +51,14 @@ import {
   CheckCircle,
   TrendingUp,
   MapPin,
-  Flame
+  Flame,
+  Package,
+  IndianRupee,
+  Boxes,
+  BookOpen,
+  Pencil,
+  AlertCircle,
+  Check
 } from 'lucide-react';
 
 export default function App() {
@@ -61,7 +71,7 @@ export default function App() {
   const [bgTheme, setBgTheme] = useState<BgTheme>(() => {
     try {
       const saved = localStorage.getItem('santhai_bg_theme');
-      return (saved === 'golden' || saved === 'ocean' || saved === 'midnight') ? (saved as BgTheme) : 'emerald';
+      return (saved === 'golden' || saved === 'ocean' || saved === 'sunset' || saved === 'amethyst' || saved === 'midnight') ? (saved as BgTheme) : 'emerald';
     } catch {
       return 'emerald';
     }
@@ -88,6 +98,7 @@ export default function App() {
   });
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [isDataVaultOpen, setIsDataVaultOpen] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
@@ -230,6 +241,17 @@ export default function App() {
     }
   }, [khataCustomers]);
 
+  // Synchronize dynamic background themes with document body
+  useEffect(() => {
+    const themeClasses = ['theme-emerald', 'theme-golden', 'theme-ocean', 'theme-sunset', 'theme-amethyst', 'theme-midnight', 'outdoor-mode'];
+    document.body.classList.remove(...themeClasses);
+    if (isOutdoorMode) {
+      document.body.classList.add('outdoor-mode');
+    } else {
+      document.body.classList.add(`theme-${bgTheme}`);
+    }
+  }, [bgTheme, isOutdoorMode]);
+
   const fetchMandiRates = async (force: boolean) => {
     setIsRefreshingPrices(true);
     try {
@@ -361,6 +383,8 @@ export default function App() {
     switch (bgTheme) {
       case 'golden': return 'theme-golden';
       case 'ocean': return 'theme-ocean';
+      case 'sunset': return 'theme-sunset';
+      case 'amethyst': return 'theme-amethyst';
       case 'midnight': return 'theme-midnight';
       case 'emerald':
       default:
@@ -369,340 +393,331 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen ${getThemeClass()} transition-colors duration-300 text-slate-900 font-sans antialiased selection:bg-emerald-100 selection:text-emerald-900 flex flex-col justify-between`}>
-      <div>
-        {/* Navigation Header */}
-        <Navbar
+    <div className={`min-h-screen ${getThemeClass()} transition-colors duration-300 text-slate-900 font-sans antialiased selection:bg-emerald-200 selection:text-emerald-950 flex flex-col md:flex-row`}>
+      {/* Desktop & Tablet Left Sidebar (Matches Reference UI) */}
+      <div className="hidden md:block shrink-0 sticky top-0 h-screen overflow-y-auto">
+        <Sidebar
           activeTab={activeTab}
           setActiveTab={handleTabSwitch}
           lang={lang}
-          setLang={setLang}
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          priceStatus={priceStatus}
-          onRefreshPrices={() => fetchMandiRates(true)}
-          isRefreshing={isRefreshingPrices}
           vendorProfile={vendorProfile}
-          onOpenAuth={() => setIsAuthModalOpen(true)}
           surplusAlertCount={surplusAlerts.length}
-          isOutdoorMode={isOutdoorMode}
-          onToggleOutdoorMode={handleToggleOutdoorMode}
-          onOpenDataVault={() => setIsDataVaultOpen(true)}
-          isOnline={isOnline}
-          canInstallPWA={Boolean(deferredPrompt)}
-          onInstallPWA={handleInstallPWA}
-          bgTheme={bgTheme}
-          onChangeBgTheme={handleChangeBgTheme}
+          onOpenAuth={() => setIsAuthModalOpen(true)}
         />
-
-        {/* Live Mandi Rate Pulse Ticker */}
-        <MarketPulseTicker
-          mandiRecords={mandiRecords}
-          lang={lang}
-          onSelectCommodity={handleSelectTickerCommodity}
-          selectedCommodity={tickerCommodity}
-        />
-
-        {/* Contextual Market Session Trading Phase Banner */}
-        <MarketSessionBanner
-          currentSession={marketSession}
-          onSelectSession={(session) => {
-            setMarketSession(session);
-            if (session === 'evening' && surplusAlerts.length > 0) {
-              setActiveTab('resq');
-            }
-          }}
-          lang={lang}
-        />
-
-        {/* Executive Stall KPI Strip */}
-        <div className="bg-white border-b border-slate-200/80 shadow-2xs">
-          <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3.5">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-              {/* Stall Location & Info */}
-              <div 
-                onClick={() => {
-                  SoundEffects.playClick();
-                  setIsAuthModalOpen(true);
-                }}
-                className="bg-gradient-to-br from-emerald-50/50 via-white to-white hover:from-emerald-50 hover:to-slate-50 transition-all p-3.5 rounded-2xl border border-emerald-200/80 shadow-2xs hover-lift cursor-pointer group"
-              >
-                <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1.5">
-                  <span className="font-bold uppercase tracking-wider flex items-center gap-1.5 text-emerald-800">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <Building2 className="w-3.5 h-3.5 text-emerald-600" />
-                    {lang === 'ta' ? 'வணிகக் கடை' : 'Active Stall'}
-                  </span>
-                  <span className="text-[10px] text-emerald-700 font-bold group-hover:underline">Edit ✎</span>
-                </div>
-                <div className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight truncate">
-                  {vendorProfile.marketComplex}
-                </div>
-                <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-0.5 truncate">
-                  <span className="font-bold text-slate-800">{vendorProfile.stallNumber}</span>
-                  <span>•</span>
-                  <span className="truncate">{vendorProfile.name}</span>
-                </div>
-                <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
-                  <span className="flex items-center gap-1 text-emerald-700 font-medium">
-                    <CheckCircle className="w-3 h-3 text-emerald-600" />
-                    Verified Merchant
-                  </span>
-                  <span className="font-mono text-slate-400">Closes {vendorProfile.closingTimeStr}</span>
-                </div>
-              </div>
-
-              {/* Vendor Trust Score */}
-              <div 
-                onClick={() => handleTabSwitch('prices')}
-                className="bg-gradient-to-br from-amber-50/50 via-white to-white hover:from-amber-50 hover:to-slate-50 transition-all p-3.5 rounded-2xl border border-amber-200/80 shadow-2xs hover-lift cursor-pointer group"
-              >
-                <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1.5">
-                  <span className="font-bold uppercase tracking-wider flex items-center gap-1.5 text-amber-900">
-                    <Award className="w-3.5 h-3.5 text-amber-600" />
-                    {lang === 'ta' ? 'நம்பிக்கை மதிப்பீடு' : 'Trust Score'}
-                  </span>
-                  <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
-                    trustScore.tier === 'Gold' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-200 text-slate-700'
-                  }`}>
-                    ★ {trustScore.tier}
-                  </span>
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="font-extrabold text-slate-900 text-2xl tabular-nums tracking-tight">
-                    {trustScore.totalScore}
-                  </span>
-                  <span className="text-xs text-slate-400 font-medium">/ 100</span>
-                  <span className="text-[11px] font-bold text-emerald-700 ml-auto bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                    Fair Trader
-                  </span>
-                </div>
-                <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
-                  <span className="truncate">Pricing Fairness: {trustScore.pricingFairnessScore}/40</span>
-                  <span className="font-mono text-emerald-700 font-semibold">0 disputes</span>
-                </div>
-              </div>
-
-              {/* Khata Outstanding */}
-              <div 
-                onClick={() => handleTabSwitch('khata')}
-                className="bg-gradient-to-br from-indigo-50/50 via-white to-white hover:from-indigo-50 hover:to-slate-50 transition-all p-3.5 rounded-2xl border border-indigo-200/80 shadow-2xs hover-lift cursor-pointer group"
-              >
-                <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1.5">
-                  <span className="font-bold uppercase tracking-wider flex items-center gap-1.5 text-indigo-900">
-                    <Coins className="w-3.5 h-3.5 text-indigo-600" />
-                    {lang === 'ta' ? 'கடன் பாக்கி' : 'Khata Credit'}
-                  </span>
-                  <span className="text-[10px] text-indigo-700 font-mono font-bold bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
-                    {khataCustomers.length} accounts
-                  </span>
-                </div>
-                <div className="font-extrabold text-slate-900 text-2xl tabular-nums tracking-tight">
-                  ₹{totalKhataOutstanding.toLocaleString()}
-                </div>
-                <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
-                  <span className="text-emerald-700 font-bold">84% On-Time Repayment</span>
-                  <span className="text-slate-400">1-Tap WhatsApp</span>
-                </div>
-              </div>
-
-              {/* Surplus Produce Status */}
-              <div 
-                onClick={() => handleTabSwitch('resq')}
-                className={`p-3.5 rounded-2xl border transition-all shadow-2xs hover-lift cursor-pointer group ${
-                  surplusAlerts.length > 0
-                    ? 'bg-gradient-to-br from-rose-50/70 via-orange-50/40 to-white hover:from-rose-100/70 border-rose-300'
-                    : 'bg-gradient-to-br from-slate-50/80 to-white hover:from-slate-100 border-slate-200'
-                }`}
-              >
-                <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1.5">
-                  <span className="font-bold uppercase tracking-wider flex items-center gap-1.5 text-rose-900">
-                    <Flame className={`w-3.5 h-3.5 ${surplusAlerts.length > 0 ? 'text-rose-600 animate-bounce' : 'text-slate-400'}`} />
-                    {lang === 'ta' ? 'மீதி எச்சரிக்கை' : 'Zero Waste ResQ'}
-                  </span>
-                  {surplusAlerts.length > 0 ? (
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-600 text-white shadow-2xs animate-pulse">
-                      Markdown Ready
-                    </span>
-                  ) : (
-                    <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                      Healthy
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className={`font-extrabold text-2xl tabular-nums tracking-tight ${surplusAlerts.length > 0 ? 'text-rose-700' : 'text-slate-900'}`}>
-                    {surplusAlerts.length} {lang === 'ta' ? 'பொருட்கள்' : 'Produce Items'}
-                  </span>
-                </div>
-                <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
-                  {surplusAlerts.length > 0 ? (
-                    <>
-                      <span className="text-rose-700 font-bold truncate">
-                        ₹{surplusAlerts.reduce((acc, a) => acc + a.potentialSavedRupees, 0)} salvage value
-                      </span>
-                      <span className="font-semibold text-rose-600 group-hover:underline">Clear ⚡</span>
-                    </>
-                  ) : (
-                    <span className="text-slate-500">Zero waste • No excess unsold stock</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <main className="max-w-7xl mx-auto px-3 sm:px-6 py-6 pb-20">
-          {activeTab === 'stock' && (
-            <StockModule
-              logs={stockLogs}
-              onAddLog={handleAddStockLog}
-              bulkOrders={bulkOrders}
-              lang={lang}
-              viewMode={viewMode}
-            />
-          )}
-
-          {activeTab === 'prices' && (
-            <PricesModule
-              mandiRecords={mandiRecords}
-              priceStatus={priceStatus}
-              onRefreshPrices={() => fetchMandiRates(true)}
-              isRefreshing={isRefreshingPrices}
-              vendorPrices={vendorPrices}
-              onUpdateVendorPrice={handleUpdateVendorPrice}
-              stockLogs={stockLogs}
-              khataCustomers={khataCustomers}
-              lang={lang}
-              viewMode={viewMode}
-            />
-          )}
-
-          {activeTab === 'resq' && (
-            <ResQModule
-              logs={stockLogs}
-              vendorPrices={vendorPrices}
-              vendorProfile={vendorProfile}
-              bulkOrders={bulkOrders}
-              onToggleClaimBulkOrder={handleToggleClaimBulkOrder}
-              lang={lang}
-              viewMode={viewMode}
-              currentTimeHour={currentTimeHour}
-            />
-          )}
-
-          {activeTab === 'khata' && (
-            <KhataModule
-              customers={khataCustomers}
-              onAddTransaction={handleAddKhataTransaction}
-              onAddCustomer={handleAddKhataCustomer}
-              vendorProfile={vendorProfile}
-              lang={lang}
-              viewMode={viewMode}
-            />
-          )}
-        </main>
       </div>
 
-      {/* Institutional Enterprise Agri-Tech Footer */}
-      <footer className="bg-white border-t border-slate-200/90 text-slate-600 text-xs mt-12">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-6 border-b border-slate-100">
-            {/* Column 1: System Identification */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-emerald-600 flex items-center justify-center text-white text-xs font-bold">
-                  🌱
-                </div>
-                <span className="font-heading font-extrabold text-slate-900 text-sm tracking-tight">
-                  SanthAI Intelligence
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 leading-relaxed">
-                Dedicated daily produce market vendor decision support system tailored for wholesale & retail markets across Tamil Nadu.
-              </p>
-              <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>TN Agri-Marketing Compliant</span>
-              </div>
-            </div>
-
-            {/* Column 2: Data & Feeds Integration */}
-            <div className="space-y-1.5">
-              <div className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                Official Data Feeds
-              </div>
-              <ul className="space-y-1 text-[11px] text-slate-500">
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  AGMARKNET (DMI, Ministry of Agriculture)
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Koyambedu Wholesale Terminal Feeds
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Uzhavar Sandhai Daily Price Registry
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  Tamil Nadu Mandi Arrival Depth Matrix
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 3: Privacy & Security */}
-            <div className="space-y-1.5">
-              <div className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                Vendor Data Sovereignty
-              </div>
-              <ul className="space-y-1 text-[11px] text-slate-500">
-                <li className="flex items-center gap-1.5">
-                  <Lock className="w-3 h-3 text-slate-400" />
-                  Local Device Storage (Zero Cloud Snooping)
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                  Bank-Grade Khata Ledger Ledger Hashes
-                </li>
-                <li className="flex items-center gap-1.5">
-                  <Building2 className="w-3 h-3 text-slate-400" />
-                  APMC Market Yard Rules Compatibility
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 4: Helplines & Vendor Support */}
-            <div className="space-y-2">
-              <div className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                Market Support Desk
-              </div>
-              <p className="text-[11px] text-slate-500">
-                For mandi price reporting discrepancies or bulk institution listings:
-              </p>
-              <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-800 bg-slate-100 p-2 rounded-xl">
-                <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                <span>1800-425-1550 (Toll-Free TN)</span>
-              </div>
-            </div>
+      {/* Mobile Slideout Navigation Drawer */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden bg-slate-900/60 backdrop-blur-xs flex animate-in fade-in duration-200">
+          <div className="w-72 bg-[#f8faf7] h-full shadow-2xl overflow-y-auto">
+            <Sidebar
+              activeTab={activeTab}
+              setActiveTab={(tab) => {
+                handleTabSwitch(tab);
+                setIsMobileMenuOpen(false);
+              }}
+              lang={lang}
+              vendorProfile={vendorProfile}
+              surplusAlertCount={surplusAlerts.length}
+              onOpenAuth={() => {
+                setIsAuthModalOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+            />
           </div>
-
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
-            <div>
-              © 2026 SanthAI Produce Market Intelligence System. All rights reserved.
-            </div>
-            <div className="flex items-center gap-4">
-              <span>Privacy & Local Storage</span>
-              <span>•</span>
-              <span>Agmarknet Terms</span>
-              <span>•</span>
-              <span className="text-emerald-600 font-medium">Status: All Systems Operational</span>
-            </div>
-          </div>
+          <div className="flex-1" onClick={() => setIsMobileMenuOpen(false)} />
         </div>
-      </footer>
+      )}
+
+      {/* Right Column: TopHeader, Pulse, & Active Module Content */}
+      <div className="flex-1 flex flex-col min-w-0 justify-between">
+        <div>
+          {/* Top Header Matching Reference Screenshot */}
+          <TopHeader
+            lang={lang}
+            setLang={setLang}
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            vendorProfile={vendorProfile}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+            isOutdoorMode={isOutdoorMode}
+            onToggleOutdoorMode={handleToggleOutdoorMode}
+            onOpenDataVault={() => setIsDataVaultOpen(true)}
+            onRefreshPrices={() => fetchMandiRates(true)}
+            isRefreshing={isRefreshingPrices}
+            bgTheme={bgTheme}
+            onChangeBgTheme={handleChangeBgTheme}
+            onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            isMobileMenuOpen={isMobileMenuOpen}
+          />
+
+          {/* Live Mandi Rate Pulse Ticker */}
+          <MarketPulseTicker
+            mandiRecords={mandiRecords}
+            lang={lang}
+            onSelectCommodity={handleSelectTickerCommodity}
+            selectedCommodity={tickerCommodity}
+          />
+
+          {/* Contextual Market Session Trading Phase Banner */}
+          <MarketSessionBanner
+            currentSession={marketSession}
+            onSelectSession={(session) => {
+              setMarketSession(session);
+              if (session === 'evening' && surplusAlerts.length > 0) {
+                setActiveTab('resq');
+              }
+            }}
+            lang={lang}
+          />
+
+          {/* Executive Stall KPI Summary Strip */}
+          <div className="border-b border-[#e3ece2]/80 bg-white/70 backdrop-blur-md px-4 sm:px-8 py-3.5">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {/* Stall Location & Info */}
+                <div 
+                  onClick={() => {
+                    SoundEffects.playClick();
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="bg-white hover:bg-slate-50/80 transition-all p-3.5 rounded-xl border border-slate-200/90 shadow-2xs cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between text-[11px] mb-1.5">
+                    <span className="font-semibold uppercase tracking-wider text-slate-500 text-[10px] flex items-center gap-1.5">
+                      <Store className="w-3.5 h-3.5 text-slate-400" />
+                      {lang === 'ta' ? 'வணிகக் கடை' : 'Active Stall'}
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-500 group-hover:text-emerald-700 flex items-center gap-1 transition-colors">
+                      <Pencil className="w-3 h-3 text-slate-400 group-hover:text-emerald-600" />
+                      {lang === 'ta' ? 'விவரங்கள்' : 'Edit'}
+                    </span>
+                  </div>
+                  <div className="font-bold text-slate-900 text-sm tracking-tight truncate">
+                    {vendorProfile.marketComplex}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 truncate">
+                    <span className="font-semibold text-slate-700">{vendorProfile.stallNumber}</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="truncate">{vendorProfile.name}</span>
+                  </div>
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                    <span className="flex items-center gap-1 text-emerald-700 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                      {lang === 'ta' ? 'சரிபார்க்கப்பட்ட கடை' : 'Verified Stall'}
+                    </span>
+                    <span className="font-mono text-slate-400">{vendorProfile.closingTimeStr}</span>
+                  </div>
+                </div>
+
+                {/* Vendor Trust Score */}
+                <div 
+                  onClick={() => handleTabSwitch('prices')}
+                  className="bg-white hover:bg-slate-50/80 transition-all p-3.5 rounded-xl border border-slate-200/90 shadow-2xs cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between text-[11px] mb-1.5">
+                    <span className="font-semibold uppercase tracking-wider text-slate-500 text-[10px] flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+                      {lang === 'ta' ? 'நம்பிக்கை மதிப்பீடு' : 'Trust Rating'}
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200/80">
+                      {trustScore.tier} Tier
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5 mt-0.5">
+                    <span className="font-bold text-slate-900 text-2xl font-sans tracking-tight tabular-nums">
+                      {trustScore.totalScore}
+                    </span>
+                    <span className="text-xs text-slate-400 font-medium">/ 100</span>
+                    <span className="ml-auto text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80 flex items-center gap-1">
+                      <Check className="w-2.5 h-2.5 text-emerald-600" />
+                      {lang === 'ta' ? 'நேர்மையான வணிகர்' : 'Fair Trader'}
+                    </span>
+                  </div>
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                    <span>{lang === 'ta' ? 'விலை நியாயம்' : 'Pricing Fairness'}: {trustScore.pricingFairnessScore}/40</span>
+                    <span className="text-emerald-700 font-medium">{lang === 'ta' ? '0 முறையீடுகள்' : '0 disputes'}</span>
+                  </div>
+                </div>
+
+                {/* Khata Outstanding */}
+                <div 
+                  onClick={() => handleTabSwitch('khata')}
+                  className="bg-white hover:bg-slate-50/80 transition-all p-3.5 rounded-xl border border-slate-200/90 shadow-2xs cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between text-[11px] mb-1.5">
+                    <span className="font-semibold uppercase tracking-wider text-slate-500 text-[10px] flex items-center gap-1.5">
+                      <Coins className="w-3.5 h-3.5 text-slate-400" />
+                      {lang === 'ta' ? 'கடன் பாக்கி (KHATA)' : 'Khata Ledger'}
+                    </span>
+                    <span className="text-[10px] font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/80">
+                      {khataCustomers.length} {lang === 'ta' ? 'கணக்குகள்' : 'accounts'}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between mt-0.5">
+                    <span className="font-bold text-slate-900 text-2xl font-sans tracking-tight tabular-nums">
+                      ₹{totalKhataOutstanding.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                    <span>{lang === 'ta' ? '84% குறித்த நேர வசூல்' : '84% on-time repayment'}</span>
+                    <span className="text-emerald-700 font-medium group-hover:underline">{lang === 'ta' ? 'கணக்குகள் →' : 'View Ledger →'}</span>
+                  </div>
+                </div>
+
+                {/* Surplus Produce Status */}
+                <div 
+                  onClick={() => handleTabSwitch('resq')}
+                  className={`p-3.5 rounded-xl border transition-all shadow-2xs cursor-pointer group ${
+                    surplusAlerts.length > 0
+                      ? 'bg-amber-50/40 hover:bg-amber-50/70 border-amber-200/90'
+                      : 'bg-white hover:bg-slate-50/80 border-slate-200/90'
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-[11px] mb-1.5">
+                    <span className="font-semibold uppercase tracking-wider text-slate-500 text-[10px] flex items-center gap-1.5">
+                      <AlertCircle className={`w-3.5 h-3.5 ${surplusAlerts.length > 0 ? 'text-amber-600' : 'text-slate-400'}`} />
+                      {lang === 'ta' ? 'மீதி சரக்கு' : 'Surplus Inventory'}
+                    </span>
+                    {surplusAlerts.length > 0 ? (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300/80 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                        {lang === 'ta' ? 'விலை திருத்தம் தேவை' : 'Action Recommended'}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-medium text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80">
+                        {lang === 'ta' ? 'இயல்பு நிலை' : 'Cleared'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    <span className={`font-bold text-2xl font-sans tracking-tight tabular-nums ${
+                      surplusAlerts.length > 0 ? 'text-amber-950' : 'text-slate-900'
+                    }`}>
+                      {surplusAlerts.length} {lang === 'ta' ? 'பொருட்கள்' : 'items'}
+                    </span>
+                  </div>
+                  <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                    {surplusAlerts.length > 0 ? (
+                      <>
+                        <span className="text-amber-800 font-medium truncate">
+                          {lang === 'ta' ? 'மீட்கக்கூடிய மதிப்பு' : 'Salvage value'}: ₹{surplusAlerts.reduce((acc, a) => acc + a.potentialSavedRupees, 0)}
+                        </span>
+                        <span className="text-amber-900 font-semibold group-hover:underline">
+                          {lang === 'ta' ? 'தீர்வு காண்க →' : 'Review →'}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-slate-500">{lang === 'ta' ? 'பூஜ்ஜிய விரயம் • உபரி இல்லை' : 'Zero waste • No unsold surplus'}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Area */}
+          <main className="max-w-7xl mx-auto px-4 sm:px-8 py-6 pb-24 md:pb-12">
+            {activeTab === 'stock' && (
+              <StockModule
+                logs={stockLogs}
+                onAddLog={handleAddStockLog}
+                bulkOrders={bulkOrders}
+                lang={lang}
+                viewMode={viewMode}
+              />
+            )}
+
+            {activeTab === 'prices' && (
+              <PricesModule
+                mandiRecords={mandiRecords}
+                priceStatus={priceStatus}
+                onRefreshPrices={() => fetchMandiRates(true)}
+                isRefreshing={isRefreshingPrices}
+                vendorPrices={vendorPrices}
+                onUpdateVendorPrice={handleUpdateVendorPrice}
+                stockLogs={stockLogs}
+                khataCustomers={khataCustomers}
+                lang={lang}
+                viewMode={viewMode}
+              />
+            )}
+
+            {activeTab === 'resq' && (
+              <ResQModule
+                logs={stockLogs}
+                vendorPrices={vendorPrices}
+                vendorProfile={vendorProfile}
+                bulkOrders={bulkOrders}
+                onToggleClaimBulkOrder={handleToggleClaimBulkOrder}
+                lang={lang}
+                viewMode={viewMode}
+                currentTimeHour={currentTimeHour}
+              />
+            )}
+
+            {activeTab === 'khata' && (
+              <KhataModule
+                customers={khataCustomers}
+                onAddTransaction={handleAddKhataTransaction}
+                onAddCustomer={handleAddKhataCustomer}
+                vendorProfile={vendorProfile}
+                lang={lang}
+                viewMode={viewMode}
+              />
+            )}
+          </main>
+        </div>
+
+        {/* Institutional Agri-Tech Footer */}
+        <footer className="bg-white border-t border-[#e3ece2] text-slate-600 text-xs mt-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400">
+              <div>
+                © 2026 SanthAI Produce Market Intelligence System. All rights reserved.
+              </div>
+              <div className="flex items-center gap-4">
+                <span>Local Storage Sovereign</span>
+                <span>•</span>
+                <span>Agmarknet Direct Data</span>
+                <span>•</span>
+                <span className="text-emerald-700 font-semibold">Status: Online</span>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+
+      {/* Mobile Bottom Navigation Bar (Thumb Reach on Small Screens) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#e3ece2] px-3 py-2 flex items-center justify-around shadow-lg">
+        {[
+          { id: 'stock' as const, label: lang === 'ta' ? 'சரக்கு' : 'Stock', icon: Package },
+          { id: 'prices' as const, label: lang === 'ta' ? 'விலை' : 'Prices', icon: IndianRupee },
+          { id: 'resq' as const, label: 'ResQ', icon: Boxes, badge: surplusAlerts.length },
+          { id: 'khata' as const, label: lang === 'ta' ? 'கடன்' : 'Khata', icon: BookOpen }
+        ].map(item => {
+          const isActive = activeTab === item.id;
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => {
+                SoundEffects.playClick();
+                handleTabSwitch(item.id);
+              }}
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors relative ${
+                isActive ? 'text-[#183a27] font-black' : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              <span className="text-[11px]">{item.label}</span>
+              {item.badge && item.badge > 0 ? (
+                <span className="absolute top-1 right-2 w-2 h-2 bg-amber-500 rounded-full" />
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
 
       {/* Prototype Vendor & Google Auth Modal */}
       <VendorAuthModal

@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { SoundEffects } from '../utils/audioHaptics';
 import confetti from 'canvas-confetti';
+import { DailyProfitCalculator } from './DailyProfitCalculator';
 import {
   BarChart,
   Bar,
@@ -619,6 +620,16 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
           </div>
         )}
       </div>
+
+      {/* POTENTIAL DAILY PROFIT CALCULATOR (Mandi Wholesale vs Vendor Selling Price & Active Stock) */}
+      <DailyProfitCalculator
+        mandiRecords={mandiRecords}
+        vendorPrices={vendorPrices}
+        stockLogs={stockLogs}
+        onUpdateVendorPrice={onUpdateVendorPrice}
+        lang={lang}
+        viewMode={viewMode}
+      />
 
       {/* Commodity Filter Chips */}
       <div className="flex items-center justify-between gap-3 overflow-x-auto pb-1">

@@ -81,6 +81,36 @@ export interface VendorPricing {
   fairPriceRange: [number, number];
 }
 
+export interface CommodityProfitCalculation {
+  commodity: CommodityType;
+  stockKg: number;
+  receivedKg: number;
+  unsoldKg: number;
+  wasteKg: number;
+  mandiWholesalePrice: number;
+  vendorSellingPrice: number;
+  grossMarginPerKg: number;
+  grossMarginPercent: number;
+  potentialRevenue: number;
+  wholesaleCost: number;
+  potentialProfit: number;
+  roiPercent: number;
+  isProfitable: boolean;
+  status: 'highly_profitable' | 'moderate' | 'thin_margin' | 'loss_risk';
+}
+
+export interface DailyProfitEstimate {
+  items: CommodityProfitCalculation[];
+  totalPotentialProfit: number;
+  totalWholesaleCost: number;
+  totalPotentialRevenue: number;
+  overallRoiPercent: number;
+  totalStockKg: number;
+  topProfitCommodity: CommodityType;
+  lossRiskCommodities: CommodityType[];
+  calculationBasis: 'daily_arrival' | 'remaining_unsold';
+}
+
 export interface TrustScoreBreakdown {
   totalScore: number; // 0 - 100
   tier: 'Gold' | 'Silver' | 'Bronze' | 'Needs Review';
@@ -145,6 +175,7 @@ export interface KhataCustomer {
   name: string;
   nameTa?: string;
   phone: string;
+  type?: string;
   totalDue: number;
   creditLimit: number;
   lastPurchaseDate: string;
@@ -160,6 +191,7 @@ export interface VendorProfile {
   name: string;
   phone: string;
   marketName: string;
+  marketComplex?: string;
   stallNumber: string;
   upiId: string;
   closingTimeStr: string; // e.g. "19:00"
@@ -169,4 +201,4 @@ export interface VendorProfile {
   isSimulatedAuth?: boolean;
 }
 
-export type BgTheme = 'emerald' | 'golden' | 'ocean' | 'midnight';
+export type BgTheme = 'emerald' | 'golden' | 'ocean' | 'sunset' | 'amethyst' | 'midnight';

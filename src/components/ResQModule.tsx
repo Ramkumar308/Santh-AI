@@ -23,7 +23,11 @@ import {
   Volume2,
   ArrowRight,
   TrendingDown,
-  Info
+  Info,
+  Zap,
+  Tag,
+  CheckCircle2,
+  PackageCheck
 } from 'lucide-react';
 
 interface ResQModuleProps {
@@ -78,22 +82,22 @@ export const ResQModule: React.FC<ResQModuleProps> = ({
   return (
     <div className="space-y-6">
       {/* ResQ Hero Banner with Mode Selector */}
-      <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white rounded-3xl p-6 sm:p-7 shadow-md">
+      <div className="bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 text-white rounded-3xl p-6 sm:p-7 shadow-md">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-white/15">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-2xl border border-white/20">
-              ⚡
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center border border-white/15">
+              <Zap className="w-6 h-6 text-amber-300" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl sm:text-2xl font-black tracking-tight">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
                   ResQ — {lang === 'ta' ? 'மீதி காய்கறி மீட்பு' : 'Surplus Produce Rescue'}
                 </h2>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full border border-white/20">
+                <span className="text-[10px] font-semibold uppercase tracking-wider bg-white/15 px-2.5 py-0.5 rounded-md border border-white/20">
                   Zero Waste
                 </span>
               </div>
-              <p className="text-xs text-amber-100 mt-0.5">
+              <p className="text-xs text-amber-200/90 mt-0.5">
                 {lang === 'ta'
                   ? 'கடை அடைக்கும் முன் மீதி காய்கறிகளை தள்ளுபடியில் விற்று நஷ்டத்தை தவிருங்கள்'
                   : 'Clear surplus produce before closing to prevent spoilage and secure bulk buyers'}
@@ -101,41 +105,43 @@ export const ResQModule: React.FC<ResQModuleProps> = ({
             </div>
           </div>
 
-          {/* Time to close adjustment (for testing markdown curve) */}
-          <div className="bg-black/20 p-2.5 rounded-2xl border border-white/10 flex items-center gap-2 text-xs">
-            <Clock className="w-4 h-4 text-amber-200" />
+          {/* Time to close adjustment */}
+          <div className="bg-black/25 px-3 py-2 rounded-xl border border-white/10 flex items-center gap-2 text-xs text-amber-100">
+            <Clock className="w-4 h-4 text-amber-300" />
             <span>Market Closes: {vendorProfile.closingTimeStr}</span>
           </div>
         </div>
 
-        {/* 2 Sub-Modes Tab Toggle (Surplus Sale vs Bulk Orders Board) */}
+        {/* 2 Sub-Modes Tab Toggle */}
         <div className="grid grid-cols-2 gap-2 mt-5">
           <button
             onClick={() => setActiveSubMode('surplus')}
-            className={`py-3 px-4 rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+            className={`py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeSubMode === 'surplus'
-                ? 'bg-white text-amber-900 shadow-sm'
+                ? 'bg-white text-slate-900 shadow-sm'
                 : 'bg-white/10 text-white hover:bg-white/15'
             }`}
           >
-            <span>🚨 {t(lang, 'clearanceSale')}</span>
+            <Tag className="w-4 h-4 text-amber-600" />
+            <span>{t(lang, 'clearanceSale')}</span>
             {surplusMatches.length > 0 && (
-              <span className="bg-rose-600 text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold">
-                {surplusMatches.length} Alert
+              <span className="bg-amber-100 text-amber-900 text-[10px] px-2 py-0.5 rounded-md font-semibold border border-amber-300">
+                {surplusMatches.length} {lang === 'ta' ? 'சரக்குகள்' : 'Alerts'}
               </span>
             )}
           </button>
 
           <button
             onClick={() => setActiveSubMode('bulk')}
-            className={`py-3 px-4 rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+            className={`py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeSubMode === 'bulk'
-                ? 'bg-white text-amber-900 shadow-sm'
+                ? 'bg-white text-slate-900 shadow-sm'
                 : 'bg-white/10 text-white hover:bg-white/15'
             }`}
           >
-            <span>🏢 {t(lang, 'bulkBoard')}</span>
-            <span className="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold">
+            <Building2 className="w-4 h-4 text-emerald-600" />
+            <span>{t(lang, 'bulkBoard')}</span>
+            <span className="bg-emerald-100 text-emerald-900 text-[10px] px-2 py-0.5 rounded-md font-semibold border border-emerald-300">
               {bulkOrders.filter(o => o.claimedByVendor).length} Active
             </span>
           </button>
@@ -146,8 +152,10 @@ export const ResQModule: React.FC<ResQModuleProps> = ({
       {activeSubMode === 'surplus' && (
         <div className="space-y-4">
           {surplusMatches.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-slate-200 p-8 text-center space-y-3">
-              <div className="text-4xl">🎉</div>
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-3">
+              <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
               <h3 className="font-bold text-slate-800 text-base">
                 {lang === 'ta' ? 'அனைத்து சரக்கும் சீராக உள்ளது!' : 'No Surplus Excess Above 5kg!'}
               </h3>

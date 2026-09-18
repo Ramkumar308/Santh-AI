@@ -1,10 +1,25 @@
 import { KhataCustomer, KhataTransaction, VendorProfile, Language } from '../types';
 
+/**
+ * KhataService: Ledger bookkeeping and quantitative credit risk assessment engine.
+ *
+ * Implements:
+ * 1. Customer Credit Risk Scoring (0 to 100):
+ *    Calculates recency-weighted penalty functions based on days overdue:
+ *    \text{Penalty} = \min(100, d \times 12)
+ *    where d is days delayed. Recent transactions carry up to 3x higher analytical weight.
+ * 2. Risk Tier Classification:
+ *    - Risk <= 30 => 'Low' (Healthy customer, eligible for higher credit line)
+ *    - 30 < Risk <= 60 => 'Medium' (Watchlist, limit expansion frozen)
+ *    - Risk > 60 => 'High' (Delinquency alert, cash-on-delivery suggested)
+ * 3. Bilingual WhatsApp Reminder Generator: Generates pre-formatted payment reconciliation links.
+ */
 export class KhataService {
   /**
-   * Computes a repayment-risk score (0 to 100)
-   * Formula: late-payment ratio weighted by recency
-   * Recent transactions carry higher weight (e.g. 1.0 vs 0.3 for older transactions).
+   * Evaluates historical payment transactions to establish dynamic repayment risk.
+   *
+   * @param transactions Array of customer credit and payment transactions
+   * @returns Risk evaluation summary with numerical score, risk level, on-time ratio, and qualitative reason
    */
   public static computeRiskScore(transactions: KhataTransaction[]): {
     riskScore: number;

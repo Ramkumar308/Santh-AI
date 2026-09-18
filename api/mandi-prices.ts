@@ -1,4 +1,35 @@
-// Vercel Serverless Function and standalone API handler for /api/mandi-prices
+/**
+ * API Endpoint: GET /api/mandi-prices
+ * Description: Fetches real-time Agmarknet wholesale mandi price feeds across Tamil Nadu markets.
+ * Architecture: Edge-compatible / Node HTTP handler with upstream fallback caching.
+ *
+ * Query Parameters:
+ *   - state (optional, default: "Tamil Nadu")
+ *   - commodity (optional, e.g. "Tomato", "Onion")
+ *
+ * Response Schema (200 OK):
+ * {
+ *   "status": "ok",
+ *   "source": string,
+ *   "records": Array<{
+ *      state: string,
+ *      district: string,
+ *      market: string,
+ *      commodity: string,
+ *      variety: string,
+ *      arrival_date: string,
+ *      min_price: string (INR/kg),
+ *      max_price: string (INR/kg),
+ *      modal_price: string (INR/kg),
+ *      arrivals_tonnes: string
+ *   }>,
+ *   "total": number,
+ *   "updatedAt": string (ISO 8601)
+ * }
+ *
+ * Caching Policy:
+ *   Cache-Control: public, s-maxage=21600, stale-while-revalidate=3600
+ */
 import type { IncomingMessage, ServerResponse } from 'http';
 
 export const TN_MANDI_REALTIME_DATA = [

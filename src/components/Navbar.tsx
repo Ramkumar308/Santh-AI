@@ -73,10 +73,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
 
   const bgThemesList: { id: BgTheme; emoji: string; nameEn: string; nameTa: string; dot: string; bgTone: string }[] = [
-    { id: 'emerald', emoji: '🌱', nameEn: 'Fresh Emerald', nameTa: 'வளமான பச்சை', dot: 'bg-emerald-500', bgTone: 'border-emerald-300 bg-emerald-50 text-emerald-800' },
-    { id: 'golden', emoji: '🌅', nameEn: 'Golden Harvest', nameTa: 'தங்க அறுவடை', dot: 'bg-amber-500', bgTone: 'border-amber-300 bg-amber-50 text-amber-900' },
-    { id: 'ocean', emoji: '🌊', nameEn: 'Nilgiri Ocean', nameTa: 'நீலகிரி தென்றல்', dot: 'bg-sky-500', bgTone: 'border-sky-300 bg-sky-50 text-sky-900' },
-    { id: 'midnight', emoji: '🌙', nameEn: 'Midnight Bazaar', nameTa: 'இரவுச் சந்தை', dot: 'bg-slate-900', bgTone: 'border-slate-700 bg-slate-900 text-slate-100' },
+    { id: 'emerald', emoji: '🌱', nameEn: 'Fresh Emerald', nameTa: 'வளமான பச்சை', dot: 'bg-emerald-500', bgTone: 'border-emerald-400 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-500/20' },
+    { id: 'golden', emoji: '🌅', nameEn: 'Golden Harvest', nameTa: 'தங்க அறுவடை', dot: 'bg-amber-500', bgTone: 'border-amber-400 bg-amber-50 text-amber-950 ring-2 ring-amber-500/20' },
+    { id: 'ocean', emoji: '🌊', nameEn: 'Nilgiri Ocean', nameTa: 'நீலகிரி தென்றல்', dot: 'bg-sky-500', bgTone: 'border-sky-400 bg-sky-50 text-sky-950 ring-2 ring-sky-500/20' },
+    { id: 'sunset', emoji: '🌺', nameEn: 'Sunset Coral', nameTa: 'மாலை செவ்வானம்', dot: 'bg-rose-500', bgTone: 'border-rose-400 bg-rose-50 text-rose-950 ring-2 ring-rose-500/20' },
+    { id: 'amethyst', emoji: '🔮', nameEn: 'Royal Amethyst', nameTa: 'ராஜ ஊதா', dot: 'bg-purple-600', bgTone: 'border-purple-400 bg-purple-50 text-purple-950 ring-2 ring-purple-500/20' },
+    { id: 'midnight', emoji: '🌙', nameEn: 'Midnight Bazaar', nameTa: 'இரவுச் சந்தை', dot: 'bg-slate-900', bgTone: 'border-slate-700 bg-slate-900 text-slate-100 ring-2 ring-emerald-500/30' },
   ];
 
   const currentThemeMeta = bgThemesList.find(t => t.id === bgTheme) || bgThemesList[0];
@@ -296,8 +298,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                             </div>
                             <div className="text-[10px] text-slate-400">
                               {t.id === 'emerald' && (lang === 'ta' ? 'இயற்கை பசுமை & ஒளி' : 'Lush Agri & Sunlit')}
-                              {t.id === 'golden' && (lang === 'ta' ? 'பாரம்பரிய சந்தை' : 'Warm Amber Harvest')}
+                              {t.id === 'golden' && (lang === 'ta' ? 'பாரம்பரிய பொன் சந்தை' : 'Warm Amber Harvest')}
                               {t.id === 'ocean' && (lang === 'ta' ? 'குளிர்ந்த மலைத் தென்றல்' : 'Cool Nilgiri Mist')}
+                              {t.id === 'sunset' && (lang === 'ta' ? 'செவ்வான மாலை வெளிச்சம்' : 'Vibrant Sunset Coral')}
+                              {t.id === 'amethyst' && (lang === 'ta' ? 'அழகிய ராஜ ஊதா' : 'Royal Velvet Amethyst')}
                               {t.id === 'midnight' && (lang === 'ta' ? 'இரவு ஆடம்பர கருமை' : 'Dark Luxury Bazaar')}
                             </div>
                           </div>

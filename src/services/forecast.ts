@@ -1,11 +1,26 @@
 import { CommodityType, DailyStockLog, DemandForecast, BulkOrderBoardItem } from '../types';
 
+/**
+ * ForecastEngine: Time-series predictive inventory modeling engine for informal produce merchants.
+ *
+ * Implements:
+ * 1. Single Exponential Smoothing (Brown's SES Model):
+ *    F_{t+1} = \alpha Y_t + (1 - \alpha) F_t
+ *    where \alpha \in [0, 1] is the smoothing constant (default: 0.45),
+ *    Y_t is realized retail walk-in demand, and F_t is prior forecast.
+ * 2. Pre-committed Institutional Demand Aggregation: Separates volatile retail footfall
+ *    from deterministic recurring B2B mess/canteen/hostel commitments.
+ * 3. Error Margin & Trend Vector Analysis: Computes Mean Absolute Deviation (MAD) to estimate buffer stock.
+ */
 export class ForecastEngine {
   /**
-   * Computes next-day demand using Exponential Smoothing:
-   * F_{t+1} = \alpha * Y_t + (1 - \alpha) * F_t
-   * where Y_t is actual quantity demanded/sold on day t,
-   * plus unfulfilled demand if stock ran out.
+   * Generates next-day recommended procurement quantity for a specific commodity.
+   *
+   * @param commodity Produce item being evaluated (e.g. Tomato, Onion)
+   * @param logs Historical daily stock and sales logs recorded by vendor
+   * @param bulkOrders Pre-arranged bulk institutional contract orders
+   * @param alpha Smoothing parameter (0.0 to 1.0; 0.45 balances responsiveness with noise reduction)
+   * @returns Comprehensive DemandForecast model including walk-in projection, bulk orders, margin of error, and bilingual advice
    */
   public static calculateForecast(
     commodity: CommodityType,

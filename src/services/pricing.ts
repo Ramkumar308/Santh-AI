@@ -1,8 +1,37 @@
-import { CommodityType, MandiPriceRecord, VendorPricing, TrustScoreBreakdown, DailyStockLog, KhataCustomer } from '../types';
+import {
+  CommodityType,
+  MandiPriceRecord,
+  VendorPricing,
+  TrustScoreBreakdown,
+  DailyStockLog,
+  KhataCustomer,
+  CommodityProfitCalculation,
+  DailyProfitEstimate
+} from '../types';
 
+/**
+ * PricingEngine: Algorithmic pricing analysis & vendor trust evaluation engine.
+ *
+ * Implements:
+ * 1. Mandi Statistical Dispersion Analysis: Computes sample mean, variance, sample standard deviation,
+ *    and empirical modal price across wholesale markets in Tamil Nadu.
+ * 2. Z-Score Outlier Classification: Detects price gouging (Z > +1.8) and unsustainable predatory undercutting (Z < -1.8).
+ * 3. Fair Price Corridor Construction: [Mean - 1.2 * StdDev, Mean + 1.4 * StdDev].
+ * 4. Composite Vendor Trust Score Index (0-100) aggregating Pricing Fairness (40%), Stockout Reliability (30%),
+ *    and Khata Credit Settlement History (30%).
+ */
 export class PricingEngine {
   /**
-   * Computes statistics (Mean, StdDev, Min, Max, Modal) for a commodity across mandis
+   * Computes comprehensive descriptive statistics across all reporting mandis for a given commodity.
+   *
+   * Mathematical Model:
+   *   Sample Mean: \mu = \frac{1}{N} \sum_{i=1}^N P_{\text{modal}, i}
+   *   Sample Variance: s^2 = \frac{1}{N-1} \sum_{i=1}^N (P_{\text{modal}, i} - \mu)^2
+   *   Sample Standard Deviation: s = \sqrt{s^2}  (with s_{\text{min}} = 1.5 to guard against zero-division)
+   *
+   * @param records Complete collection of MandiPriceRecord objects from Agmarknet
+   * @param commodity Target produce commodity (e.g., 'Tomato', 'Onion')
+   * @returns Object containing mean, stdDev, absolute min, absolute max, modal price, and sample count
    */
   public static getMandiStats(records: MandiPriceRecord[], commodity: CommodityType) {
     const relevant = records.filter(r => r.commodity === commodity);
@@ -44,7 +73,20 @@ export class PricingEngine {
   }
 
   /**
-   * Evaluates vendor's price against mandi distribution using Z-Score
+   * Evaluates a vendor's retail selling price against the statewide wholesale distribution.
+   *
+   * Formulations:
+   *   Standardized Z-Score: Z = \frac{P_{\text{vendor}} - \mu}{\sigma}
+   *   Outlier Classification:
+   *     - Z > +1.8  => Price Gouging (Exploitative margin, triggers buyer warning)
+   *     - Z < -1.8  => Undercutting (Below sustainable wholesale floor, potential quality risk)
+   *     - -1.8 <= Z <= +1.8 => Market Conforming / Fair Pricing
+   *   Fair Price Corridor: [ \max(10, \mu - 1.2\sigma),\; \mu + 1.4\sigma ]
+   *
+   * @param vendorPrice The stall owner's active retail price (₹/kg)
+   * @param commodity Target produce commodity
+   * @param mandiRecords Array of current Agmarknet mandi price records
+   * @returns VendorPricing structured evaluation object
    */
   public static evaluateVendorPrice(
     vendorPrice: number,
@@ -247,6 +289,147 @@ export class PricingEngine {
       suggestedRetailPerKg,
       grossMarginPerKg,
       profitPer100KgLot
+    };
+  }
+
+  /**
+   * Calculates potential daily profit across all commodities based on:
+   * 1. Current Mandi wholesale prices (modal benchmark)
+   * 2. Vendor's actual retail selling prices
+   * 3. Current stock levels (either total daily arrival or remaining unsold inventory)
+   */
+  public static calculateDailyProfitEstimate(params: {
+    vendorPrices: Record<CommodityType, number>;
+    mandiRecords: MandiPriceRecord[];
+    stockLogs: DailyStockLog[];
+    calculationBasis?: 'daily_arrival' | 'remaining_unsold';
+    customStockOverrides?: Partial<Record<CommodityType, number>>;
+    includeWastageAdjustment?: boolean;
+    freightPerKg?: number;
+  }): DailyProfitEstimate {
+    const {
+      vendorPrices,
+      mandiRecords,
+      stockLogs,
+      calculationBasis = 'daily_arrival',
+      customStockOverrides = {},
+      includeWastageAdjustment = true,
+      freightPerKg = 0
+    } = params;
+
+    const commodities: CommodityType[] = ['Tomato', 'Onion', 'Potato', 'Brinjal', 'Cabbage', 'Carrot'];
+
+    const items: CommodityProfitCalculation[] = commodities.map(comm => {
+      // Find latest stock log for commodity (sorted by date descending)
+      const commLogs = stockLogs
+        .filter(l => l.commodity === comm)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      const latestLog = commLogs[0];
+      const receivedKg = latestLog?.receivedKg ?? 40;
+      const unsoldKg = latestLog?.unsoldKg ?? 5;
+      const wasteKg = latestLog?.wasteKg ?? 1;
+
+      // Determine active stock kg
+      let stockKg: number;
+      if (customStockOverrides[comm] !== undefined && customStockOverrides[comm] !== null) {
+        stockKg = Math.max(0, customStockOverrides[comm]!);
+      } else if (calculationBasis === 'remaining_unsold') {
+        stockKg = Math.max(0, unsoldKg);
+      } else {
+        stockKg = Math.max(0, receivedKg);
+      }
+
+      // Wholesale cost per kg (Mandi modal + optional freight)
+      const stats = this.getMandiStats(mandiRecords, comm);
+      const mandiWholesalePrice = stats.modal + (freightPerKg || 0);
+
+      // Selling price per kg
+      const vendorSellingPrice = vendorPrices[comm] || stats.modal;
+
+      // Margin calculations
+      const grossMarginPerKg = Math.round((vendorSellingPrice - mandiWholesalePrice) * 10) / 10;
+      const grossMarginPercent = mandiWholesalePrice > 0
+        ? Math.round((grossMarginPerKg / mandiWholesalePrice) * 1000) / 10
+        : 0;
+
+      // Total wholesale procurement outlay
+      const wholesaleCost = Math.round(stockKg * mandiWholesalePrice);
+
+      // Revenue and net profit
+      let potentialRevenue = 0;
+      if (includeWastageAdjustment && receivedKg > 0) {
+        // Effective sellable weight factoring in wastage ratio
+        const wasteRatio = Math.min(0.25, Math.max(0, wasteKg / receivedKg));
+        const usableKg = stockKg * (1 - wasteRatio);
+        potentialRevenue = Math.round(usableKg * vendorSellingPrice);
+      } else {
+        potentialRevenue = Math.round(stockKg * vendorSellingPrice);
+      }
+
+      const potentialProfit = potentialRevenue - wholesaleCost;
+      const roiPercent = wholesaleCost > 0
+        ? Math.round((potentialProfit / wholesaleCost) * 1000) / 10
+        : 0;
+
+      const isProfitable = potentialProfit > 0;
+
+      let status: 'highly_profitable' | 'moderate' | 'thin_margin' | 'loss_risk';
+      if (potentialProfit < 0) {
+        status = 'loss_risk';
+      } else if (grossMarginPercent < 12) {
+        status = 'thin_margin';
+      } else if (grossMarginPercent >= 25) {
+        status = 'highly_profitable';
+      } else {
+        status = 'moderate';
+      }
+
+      return {
+        commodity: comm,
+        stockKg,
+        receivedKg,
+        unsoldKg,
+        wasteKg,
+        mandiWholesalePrice,
+        vendorSellingPrice,
+        grossMarginPerKg,
+        grossMarginPercent,
+        potentialRevenue,
+        wholesaleCost,
+        potentialProfit,
+        roiPercent,
+        isProfitable,
+        status
+      };
+    });
+
+    const totalPotentialProfit = items.reduce((acc, it) => acc + it.potentialProfit, 0);
+    const totalWholesaleCost = items.reduce((acc, it) => acc + it.wholesaleCost, 0);
+    const totalPotentialRevenue = items.reduce((acc, it) => acc + it.potentialRevenue, 0);
+    const totalStockKg = items.reduce((acc, it) => acc + it.stockKg, 0);
+
+    const overallRoiPercent = totalWholesaleCost > 0
+      ? Math.round((totalPotentialProfit / totalWholesaleCost) * 1000) / 10
+      : 0;
+
+    // Determine top profit-generating commodity
+    const sortedByProfit = [...items].sort((a, b) => b.potentialProfit - a.potentialProfit);
+    const topProfitCommodity = sortedByProfit[0]?.commodity || 'Tomato';
+
+    // Identify commodities selling below cost
+    const lossRiskCommodities = items.filter(it => it.potentialProfit < 0).map(it => it.commodity);
+
+    return {
+      items,
+      totalPotentialProfit,
+      totalWholesaleCost,
+      totalPotentialRevenue,
+      overallRoiPercent,
+      totalStockKg,
+      topProfitCommodity,
+      lossRiskCommodities,
+      calculationBasis
     };
   }
 }
