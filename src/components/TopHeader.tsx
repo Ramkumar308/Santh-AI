@@ -258,52 +258,52 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             )}
           </button>
 
-          {/* Theme Palette Switcher */}
-          <button
-            onClick={() => {
-              SoundEffects.playClick();
-              setIsThemeOpen(prev => !prev);
-            }}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-2xl border transition-all shadow-2xs btn-press ${
-              isThemeOpen
-                ? 'bg-slate-900 text-white border-slate-900 ring-2 ring-emerald-500/30'
-                : 'bg-white/95 border-slate-200/90 text-slate-700 hover:bg-slate-50'
-            }`}
-            title={lang === 'ta' ? 'வண்ண தீம்கள்' : 'Theme Palettes'}
-          >
-            <Palette className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="text-xs font-bold hidden sm:inline">
-              {lang === 'ta' ? 'தீம்கள்' : 'Themes'}
-            </span>
-          </button>
+          {/* Quick Utility Cluster: Theme, Outdoor, Vault */}
+          <div className="flex items-center rounded-xl bg-slate-100/90 border border-slate-200/80 p-0.5 shadow-2xs">
+            <button
+              onClick={() => {
+                SoundEffects.playClick();
+                setIsThemeOpen(prev => !prev);
+              }}
+              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                isThemeOpen
+                  ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+              title={lang === 'ta' ? 'வண்ண தீம்கள்' : 'Theme Palettes'}
+              aria-label="Theme Palettes"
+            >
+              <Palette className="w-3.5 h-3.5 text-emerald-600" />
+            </button>
 
-          {/* Outdoor Sunlight Mode Toggle */}
-          <button
-            onClick={() => {
-              SoundEffects.playClick();
-              onToggleOutdoorMode();
-            }}
-            className={`p-2 rounded-2xl border transition-all btn-press ${
-              isOutdoorMode
-                ? 'bg-amber-400 border-amber-500 text-amber-950 shadow-xs'
-                : 'bg-white/95 border-slate-200/90 text-slate-600 hover:bg-slate-50'
-            }`}
-            title={lang === 'ta' ? 'வெயில் பார்வை முறை' : 'Outdoor high contrast mode'}
-          >
-            <Sun className="w-4 h-4" />
-          </button>
+            <button
+              onClick={() => {
+                SoundEffects.playClick();
+                onToggleOutdoorMode();
+              }}
+              className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                isOutdoorMode
+                  ? 'bg-amber-400 text-amber-950 shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+              title={lang === 'ta' ? 'வெயில் பார்வை முறை' : 'Outdoor high contrast mode'}
+              aria-label="Outdoor high contrast mode"
+            >
+              <Sun className="w-3.5 h-3.5" />
+            </button>
 
-          {/* Local Data Vault Backup */}
-          <button
-            onClick={() => {
-              SoundEffects.playClick();
-              onOpenDataVault();
-            }}
-            className="p-2 rounded-2xl bg-white/95 border border-slate-200/90 text-slate-600 hover:bg-slate-50 transition-colors btn-press"
-            title={lang === 'ta' ? 'தரவு பெட்டகம்' : 'Data Vault'}
-          >
-            <HardDrive className="w-4 h-4" />
-          </button>
+            <button
+              onClick={() => {
+                SoundEffects.playClick();
+                onOpenDataVault();
+              }}
+              className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-colors cursor-pointer"
+              title={lang === 'ta' ? 'தரவு பெட்டகம்' : 'Data Vault'}
+              aria-label="Data Vault"
+            >
+              <HardDrive className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 

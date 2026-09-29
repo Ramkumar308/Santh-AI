@@ -28,7 +28,6 @@ import { FirebaseService, auth } from './services/firebase';
 import { User } from 'firebase/auth';
 import { ResQService } from './services/resq';
 import { PricingEngine } from './services/pricing';
-import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
 import { TopHeader } from './components/TopHeader';
 import { StockModule } from './components/StockModule';

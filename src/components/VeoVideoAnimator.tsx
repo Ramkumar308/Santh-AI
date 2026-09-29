@@ -36,6 +36,7 @@ export const VeoVideoAnimator: React.FC<VeoVideoAnimatorProps> = ({ lang }) => {
 
   const sampleImages = [
     {
+      id: 'tomato' as const,
       name: lang === 'ta' ? 'நாட்டுத் தக்காளி கூடை' : 'Fresh Tomato Basket',
       url: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80',
       presetPrompt: lang === 'ta'
@@ -43,6 +44,7 @@ export const VeoVideoAnimator: React.FC<VeoVideoAnimatorProps> = ({ lang }) => {
         : 'Slow cinematic motion zooming gently into fresh ripe red tomatoes with soft morning sunlight'
     },
     {
+      id: 'carrot' as const,
       name: lang === 'ta' ? 'நீலகிரி மலை உருளை & கேரட்' : 'Ooty Hills Carrot & Potato',
       url: 'https://images.unsplash.com/photo-1447175008436-054170c2e979?w=800&auto=format&fit=crop&q=80',
       presetPrompt: lang === 'ta'
@@ -50,6 +52,7 @@ export const VeoVideoAnimator: React.FC<VeoVideoAnimatorProps> = ({ lang }) => {
         : 'Atmospheric panning shot over freshly harvested farm vegetables with mist and subtle lens flare'
     },
     {
+      id: 'market' as const,
       name: lang === 'ta' ? 'கோயம்பேடு மாலை சந்தை' : 'Mandi Evening Market Stall',
       url: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&auto=format&fit=crop&q=80',
       presetPrompt: lang === 'ta'
@@ -57,6 +60,84 @@ export const VeoVideoAnimator: React.FC<VeoVideoAnimatorProps> = ({ lang }) => {
         : 'Gentle vibrant motion through a bustling Indian produce market stall with warm twilight lamps'
     }
   ];
+
+  // Guaranteed resilient canvas generator for produce samples
+  const createProduceSampleCanvas = (type: 'tomato' | 'carrot' | 'market'): string => {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1280;
+      canvas.height = 720;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return '';
+
+      if (type === 'tomato') {
+        const grad = ctx.createLinearGradient(0, 0, 1280, 720);
+        grad.addColorStop(0, '#7f1d1d');
+        grad.addColorStop(0.5, '#dc2626');
+        grad.addColorStop(1, '#991b1b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1280, 720);
+
+        for (let i = 0; i < 7; i++) {
+          const x = 200 + i * 145 + (i % 2) * 35;
+          const y = 370 + (i % 3) * 50;
+          const r = 85 + (i % 2) * 15;
+          const radGrad = ctx.createRadialGradient(x - 20, y - 20, 15, x, y, r);
+          radGrad.addColorStop(0, '#fca5a5');
+          radGrad.addColorStop(0.6, '#ef4444');
+          radGrad.addColorStop(1, '#991b1b');
+          ctx.fillStyle = radGrad;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#16a34a';
+          ctx.beginPath();
+          ctx.arc(x, y - r + 8, 14, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+        ctx.font = 'bold 44px sans-serif';
+        ctx.fillText('Fresh Organic Tomatoes • நாட்டுத் தக்காளி', 60, 100);
+        ctx.font = '24px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fillText('Koyambedu Wholesale Selection • Grade A Produce', 60, 145);
+      } else if (type === 'carrot') {
+        const grad = ctx.createLinearGradient(0, 0, 1280, 720);
+        grad.addColorStop(0, '#7c2d12');
+        grad.addColorStop(0.5, '#ea580c');
+        grad.addColorStop(1, '#9a3412');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1280, 720);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+        ctx.font = 'bold 44px sans-serif';
+        ctx.fillText('Ooty Hill Carrots & Nilgiri Produce', 60, 100);
+        ctx.font = '24px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fillText('Fresh Mountain Harvest • நீலகிரி மலை கேரட்', 60, 145);
+      } else {
+        const grad = ctx.createLinearGradient(0, 0, 1280, 720);
+        grad.addColorStop(0, '#0f172a');
+        grad.addColorStop(0.5, '#1e293b');
+        grad.addColorStop(1, '#020617');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1280, 720);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+        ctx.font = 'bold 44px sans-serif';
+        ctx.fillText('Koyambedu Evening Produce Mandi', 60, 100);
+        ctx.font = '24px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fillText('Bustling Market Atmosphere • மாலை நேர அங்காடி', 60, 145);
+      }
+
+      return canvas.toDataURL('image/jpeg', 0.9);
+    } catch {
+      return '';
+    }
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,18 +156,27 @@ export const VeoVideoAnimator: React.FC<VeoVideoAnimatorProps> = ({ lang }) => {
   const handleSelectSample = async (sample: typeof sampleImages[0]) => {
     SoundEffects.playClick();
     setPrompt(sample.presetPrompt);
+    setError(null);
+
     try {
-      const resp = await fetch(sample.url);
+      const resp = await fetch(sample.url, { mode: 'cors' });
+      if (!resp.ok) throw new Error('Unsplash fetch error');
       const blob = await resp.blob();
       const reader = new FileReader();
       reader.onloadend = () => {
         setImageBase64(reader.result as string);
         setVideoBlobUrl(null);
-        setError(null);
       };
       reader.readAsDataURL(blob);
     } catch {
-      setError('Could not load sample image. Please upload a photo from your device.');
+      // Immediate reliable local canvas fallback
+      const fallbackUrl = createProduceSampleCanvas(sample.id);
+      if (fallbackUrl) {
+        setImageBase64(fallbackUrl);
+        setVideoBlobUrl(null);
+      } else {
+        setError('Please upload a photo from your device.');
+      }
     }
   };
 
@@ -367,6 +457,27 @@ export const VeoVideoAnimator: React.FC<VeoVideoAnimatorProps> = ({ lang }) => {
               }
               className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none text-slate-800"
             />
+            {/* Quick Motion Presets */}
+            <div className="flex items-center gap-1.5 flex-wrap mt-2">
+              <span className="text-[10px] text-slate-400 font-semibold">{lang === 'ta' ? 'பாணிகள்:' : 'Styles:'}</span>
+              {[
+                { labelEn: 'Cinematic Zoom', labelTa: 'சினிமா ஜூம்', text: 'Slow cinematic zoom into fresh produce with warm morning lighting' },
+                { labelEn: 'Vibrant Pan', labelTa: 'வண்ணமய அசைவு', text: 'Gentle vibrant lateral camera pan across market vegetable crates' },
+                { labelEn: 'Dew Drops Macro', labelTa: 'பனித்துளி மேக்ரோ', text: 'Detailed macro camera motion emphasizing natural fresh sheen' }
+              ].map((preset, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    SoundEffects.playClick();
+                    setPrompt(preset.text);
+                  }}
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 hover:bg-purple-100 hover:text-purple-800 text-slate-600 transition-colors cursor-pointer"
+                >
+                  {lang === 'ta' ? preset.labelTa : preset.labelEn}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Generate Button */}

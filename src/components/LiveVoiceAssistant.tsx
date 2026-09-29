@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Radio, Mic, MicOff, Volume2, Send, RefreshCw, AlertCircle, Bot, User, Sparkles } from 'lucide-react';
+import { Radio, Mic, MicOff, Volume2, VolumeX, Send, RefreshCw, AlertCircle, Bot, User, Sparkles } from 'lucide-react';
 import { Language } from '../types';
 
 interface LiveVoiceAssistantProps {
@@ -28,10 +28,27 @@ export const LiveVoiceAssistant: React.FC<LiveVoiceAssistantProps> = ({ lang }) 
     }
   ]);
   const [error, setError] = useState<string | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const starterQuestionsEn = [
+    "Today's Koyambedu tomato and onion rate?",
+    "How much potato should I procure tomorrow?",
+    "Tips to recover customer Khata credit quickly",
+    "How to price surplus cabbage before evening close?"
+  ];
+
+  const starterQuestionsTa = [
+    "இன்றைய கோயம்பேடு தக்காளி மற்றும் வெங்காயம் விலை?",
+    "நாளைக்கு எவ்வளவு உருளைக்கிழங்கு சரக்கு எடுக்கலாம்?",
+    "வாடிக்கையாளர் கடன் வசூல் செய்ய நல்ல ஆலோசனை",
+    "மாலை நேர உபரி முட்டைகோஸை எப்படி தள்ளுபடியில் விற்பது?"
+  ];
+
+  const starters = lang === 'ta' ? starterQuestionsTa : starterQuestionsEn;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -45,7 +62,17 @@ export const LiveVoiceAssistant: React.FC<LiveVoiceAssistantProps> = ({ lang }) 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang === 'ta' ? 'ta-IN' : 'en-IN';
       utterance.rate = 1.0;
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
       window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
     }
   };
 
@@ -161,6 +188,39 @@ export const LiveVoiceAssistant: React.FC<LiveVoiceAssistantProps> = ({ lang }) 
             </p>
           </div>
         </div>
+
+        {/* Audio Stop and Reset Chat Buttons */}
+        <div className="flex items-center gap-2">
+          {isSpeaking && (
+            <button
+              type="button"
+              onClick={stopSpeaking}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200 hover:bg-rose-100 transition-colors animate-pulse cursor-pointer shadow-2xs"
+            >
+              <VolumeX className="w-3.5 h-3.5" />
+              <span>{lang === 'ta' ? 'குரலை நிறுத்து' : 'Stop Audio'}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              stopSpeaking();
+              setTurns([
+                {
+                  role: 'assistant',
+                  text:
+                    lang === 'ta'
+                      ? 'வணக்கம்! நான் SanthAI நேரலை குரல் உதவியாளர் (gemini-3.8-live). இன்றைய சந்தை விலை, வரத்து அல்லது கழிவு மேலாண்மை குறித்து கேளுங்கள்.'
+                      : 'Namaste! I am your SanthAI Live Assistant (gemini-3.8-live). Ask me anything in real-time regarding today\'s mandi prices, stock forecast, or customer credit.',
+                  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                }
+              ]);
+            }}
+            className="text-[11px] font-semibold px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            {lang === 'ta' ? 'அழி' : 'Clear'}
+          </button>
+        </div>
       </div>
 
       {/* Messages Scroll Area */}
@@ -219,8 +279,26 @@ export const LiveVoiceAssistant: React.FC<LiveVoiceAssistantProps> = ({ lang }) 
         </div>
       )}
 
+      {/* Quick starter question chips */}
+      {turns.length <= 2 && (
+        <div className="py-2 flex items-center gap-1.5 overflow-x-auto text-[11px] shrink-0 no-scrollbar">
+          <span className="text-slate-400 font-semibold shrink-0 text-[10px]">{lang === 'ta' ? 'வினவல்கள்:' : 'Ask:'}</span>
+          {starters.map((q, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleSend(q)}
+              disabled={loading}
+              className="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200/80 shrink-0 text-left transition-colors cursor-pointer"
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Input Bar & Live Mic Button */}
-      <div className="pt-3 border-t border-slate-100 flex items-center gap-2 shrink-0">
+      <div className="pt-2 border-t border-slate-100 flex items-center gap-2 shrink-0">
         <button
           id="gemini-live-mic-btn"
           type="button"

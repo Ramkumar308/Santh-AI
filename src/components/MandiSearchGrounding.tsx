@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Globe, ExternalLink, RefreshCw, AlertCircle, TrendingUp, HelpCircle } from 'lucide-react';
+import { Search, Globe, ExternalLink, RefreshCw, AlertCircle, TrendingUp, HelpCircle, Copy, Check } from 'lucide-react';
 import { Language } from '../types';
 
 interface MandiSearchGroundingProps {
@@ -12,6 +12,7 @@ export const MandiSearchGrounding: React.FC<MandiSearchGroundingProps> = ({ lang
   const [sources, setSources] = useState<{ title: string; url: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<boolean>(false);
 
   const presetQueriesEn = [
     'Today Koyambedu wholesale tomato and onion arrivals and price trend',
@@ -144,6 +145,26 @@ export const MandiSearchGrounding: React.FC<MandiSearchGroundingProps> = ({ lang
 
         {resultText && !loading && (
           <div className="space-y-4 rounded-xl bg-slate-50/80 border border-slate-200 p-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5 text-blue-600" />
+                {lang === 'ta' ? 'தேடல் ஆய்வு அறிக்கை' : 'Grounded Market Intelligence'}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(resultText);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs cursor-pointer"
+                title="Copy to clipboard"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+                <span>{copied ? (lang === 'ta' ? 'நகலெடுக்கப்பட்டது!' : 'Copied!') : (lang === 'ta' ? 'நகலெடு' : 'Copy')}</span>
+              </button>
+            </div>
+
             <div className="prose prose-sm max-w-none text-slate-800 text-xs sm:text-sm whitespace-pre-wrap leading-relaxed">
               {resultText}
             </div>
