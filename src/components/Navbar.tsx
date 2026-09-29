@@ -20,13 +20,13 @@ import {
   DownloadCloud,
   Palette
 } from 'lucide-react';
-import { Language, ViewMode, PriceStatus, VendorProfile, BgTheme } from '../types';
+import { Language, ViewMode, PriceStatus, VendorProfile, BgTheme, ActiveTab } from '../types';
 import { t, speakText, stopSpeaking } from '../utils/i18n';
 import { SoundEffects } from '../utils/audioHaptics';
 
 interface NavbarProps {
-  activeTab: 'stock' | 'prices' | 'resq' | 'khata';
-  setActiveTab: (tab: 'stock' | 'prices' | 'resq' | 'khata') => void;
+  activeTab: ActiveTab;
+  setActiveTab: (tab: ActiveTab) => void;
   lang: Language;
   setLang: (lang: Language) => void;
   viewMode: ViewMode;
@@ -449,6 +449,31 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {t(lang, 'navKhataSub')}
               </span>
             </div>
+          </button>
+
+          {/* Tab 5: AI Studio (Veo, Live, Image, Search) */}
+          <button
+            id="nav-tab-aistudio"
+            onClick={() => {
+              SoundEffects.playClick();
+              setActiveTab('aistudio');
+            }}
+            className={`relative flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2.5 py-2.5 px-3 rounded-xl transition-all min-h-[54px] cursor-pointer ${
+              activeTab === 'aistudio'
+                ? 'bg-gradient-to-r from-purple-700 to-indigo-800 text-white font-bold shadow-sm'
+                : 'bg-slate-50/80 text-slate-700 hover:bg-slate-100 hover:text-slate-900 font-semibold border border-slate-200/60'
+            }`}
+          >
+            <Sparkles className={`w-5 h-5 shrink-0 ${activeTab === 'aistudio' ? 'text-purple-200 animate-spin-slow' : 'text-purple-600'}`} />
+            <div className="text-center sm:text-left leading-tight">
+              <span className="text-xs sm:text-sm block">{lang === 'ta' ? 'AI ஸ்டுடியோ' : 'AI Studio'}</span>
+              <span className={`text-[10px] hidden sm:block ${activeTab === 'aistudio' ? 'text-purple-100' : 'text-slate-500'}`}>
+                {lang === 'ta' ? 'வீடியோ & நேரலை' : 'Veo & Live'}
+              </span>
+            </div>
+            <span className="hidden xl:inline-block px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-200 text-[9px] font-mono font-bold uppercase ml-1">
+              AI
+            </span>
           </button>
         </div>
       </nav>

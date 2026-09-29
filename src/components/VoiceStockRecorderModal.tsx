@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { CommodityType, DailyStockLog, Language } from '../types';
 import { COMMODITIES } from '../data/commodities';
+import { ProduceBadge } from './ProduceBadge';
 import { parseSpokenStockEntry, ParsedStockVoiceInput } from '../services/voiceStockParser';
 import { SoundEffects } from '../utils/audioHaptics';
 import { speakText } from '../utils/i18n';
@@ -359,8 +360,8 @@ export const VoiceStockRecorderModal: React.FC<VoiceStockRecorderModalProps> = (
         {/* Parsed Produce Quantities Card (High Visual Clarity for Low-Literacy) */}
         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-            <div className="flex items-center gap-2">
-              <span className="text-3xl">{currentMeta.iconEmoji}</span>
+            <div className="flex items-center gap-3">
+              <ProduceBadge commodity={currentCommodity} size="md" />
               <div>
                 <div className="font-black text-slate-900 text-base">
                   {lang === 'ta' ? currentMeta.nameTa : currentMeta.nameEn}

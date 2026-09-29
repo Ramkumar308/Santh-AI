@@ -13,12 +13,12 @@ import {
   Sun,
   HardDrive
 } from 'lucide-react';
-import { Language, VendorProfile, BgTheme } from '../types';
+import { Language, VendorProfile, BgTheme, ActiveTab } from '../types';
 import { SoundEffects } from '../utils/audioHaptics';
 
 interface SidebarProps {
-  activeTab: 'stock' | 'prices' | 'resq' | 'khata';
-  setActiveTab: (tab: 'stock' | 'prices' | 'resq' | 'khata') => void;
+  activeTab: ActiveTab;
+  setActiveTab: (tab: ActiveTab) => void;
   lang: Language;
   vendorProfile: VendorProfile;
   surplusAlertCount: number;
@@ -34,13 +34,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenAuth
 }) => {
   const navItems: {
-    id: 'stock' | 'prices' | 'resq' | 'khata';
+    id: ActiveTab;
     nameEn: string;
     nameTa: string;
     subEn: string;
     subTa: string;
     icon: React.ComponentType<{ className?: string }>;
     badgeCount?: number;
+    isAiBadge?: boolean;
   }[] = [
     {
       id: 'stock',
@@ -74,16 +75,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
       subEn: 'Track credit',
       subTa: 'கடன் & வசூல்',
       icon: BookOpen
+    },
+    {
+      id: 'aistudio',
+      nameEn: 'AI Studio',
+      nameTa: 'AI ஸ்டுடியோ',
+      subEn: 'Veo, Live, Search',
+      subTa: 'வீடியோ & நேரலை AI',
+      icon: Sparkles,
+      isAiBadge: true
     }
   ];
 
   return (
-    <aside className="w-64 shrink-0 bg-[#f8faf7] border-r border-[#e3ece2] flex flex-col justify-between p-4 sm:p-5 min-h-screen select-none">
+    <aside className="w-64 shrink-0 bg-white/60 backdrop-blur-2xl border-r border-black/[0.06] flex flex-col justify-between p-4 sm:p-5 min-h-screen select-none shadow-[2px_0_16px_rgba(0,0,0,0.02)]">
       <div className="space-y-6">
         {/* Brand Header */}
         <div className="flex items-center gap-3 px-1 py-1">
-          <div className="w-10 h-10 rounded-2xl bg-[#183a27] flex items-center justify-center text-white shadow-xs shrink-0">
-            <Leaf className="w-5 h-5 fill-white/20" />
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#183a27] to-[#122c1d] flex items-center justify-center text-white shadow-sm shrink-0 ring-2 ring-emerald-500/20">
+            <Leaf className="w-5 h-5 fill-white/20 text-emerald-400" />
           </div>
           <div>
             <div className="flex items-center gap-1">
@@ -111,18 +121,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   SoundEffects.playClick();
                   setActiveTab(item.id);
                 }}
-                className={`w-full text-left flex items-center justify-between p-3 rounded-2xl transition-all duration-200 ${
+                className={`w-full text-left flex items-center justify-between p-3 rounded-2xl transition-all duration-200 btn-press cursor-pointer ${
                   isActive
-                    ? 'bg-[#183a27] text-white shadow-sm ring-1 ring-black/5'
-                    : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900'
+                    ? 'bg-[#183a27] text-white shadow-md ring-1 ring-emerald-500/30'
+                    : 'text-slate-700 hover:bg-slate-200/60 hover:text-slate-900'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
                       isActive
-                        ? 'bg-[#254d35] text-white'
-                        : 'bg-white border border-slate-200/70 text-slate-600 shadow-2xs'
+                        ? 'bg-[#254d35] text-white shadow-2xs'
+                        : 'bg-white border border-slate-200/80 text-slate-600 shadow-2xs'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -133,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                     <div
                       className={`text-xs ${
-                        isActive ? 'text-[#a7f3d0]' : 'text-slate-400'
+                        isActive ? 'text-[#a7f3d0] font-medium' : 'text-slate-400'
                       }`}
                     >
                       {lang === 'ta' ? item.subTa : item.subEn}
@@ -143,13 +153,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                 {item.badgeCount && item.badgeCount > 0 ? (
                   <span
-                    className={`px-2 py-0.5 rounded-md text-xs font-semibold ${
+                    className={`px-2 py-0.5 rounded-lg text-xs font-bold ${
                       isActive
-                        ? 'bg-amber-400 text-amber-950 font-bold'
-                        : 'bg-amber-100 text-amber-900 border border-amber-300/70'
+                        ? 'bg-amber-400 text-amber-950 font-black shadow-xs'
+                        : 'bg-amber-100 text-amber-900 border border-amber-300/80'
                     }`}
                   >
                     {item.badgeCount}
+                  </span>
+                ) : item.isAiBadge ? (
+                  <span
+                    className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold tracking-tight uppercase ${
+                      isActive
+                        ? 'bg-purple-400 text-purple-950'
+                        : 'bg-purple-100 text-purple-800 border border-purple-200'
+                    }`}
+                  >
+                    Veo+Live
                   </span>
                 ) : null}
               </button>
@@ -160,10 +180,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <div className="space-y-4 pt-4 border-t border-[#e3ece2]">
         {/* WhatsApp-First Info Card as in reference screenshot */}
-        <div className="bg-[#eaf4ec] border border-[#d6ebd9] rounded-2xl p-4 text-left relative overflow-hidden">
-          <div className="flex items-center gap-2 text-emerald-700 mb-1.5">
-            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700">
-              <MessageCircle className="w-3.5 h-3.5" />
+        <div className="bg-[#eaf4ec] border border-[#d6ebd9] rounded-2xl p-4 text-left relative overflow-hidden shadow-2xs">
+          <div className="flex items-center gap-2 text-emerald-800 mb-1.5">
+            <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-2xs">
+              <MessageCircle className="w-3.5 h-3.5 fill-white/20" />
             </div>
             <span className="text-xs font-black uppercase tracking-wider font-heading">
               {lang === 'ta' ? 'வாட்ஸ்அப் முதன்மை' : 'WhatsApp-first'}
@@ -182,10 +202,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             SoundEffects.playClick();
             onOpenAuth();
           }}
-          className="w-full flex items-center justify-between p-2.5 rounded-2xl hover:bg-slate-200/50 transition-colors text-left group border border-transparent hover:border-slate-200"
+          className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-white hover:bg-slate-100/80 transition-all text-left group border border-slate-200/80 hover:border-slate-300 shadow-2xs btn-press cursor-pointer"
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-[#fed7aa] text-amber-900 font-bold flex items-center justify-center shrink-0 border border-amber-300 text-sm shadow-2xs font-display">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-400 to-orange-300 text-amber-950 font-bold flex items-center justify-center shrink-0 border border-amber-300 text-sm shadow-2xs font-display">
               {vendorProfile.name ? vendorProfile.name.charAt(0).toUpperCase() : 'S'}
             </div>
             <div className="min-w-0">

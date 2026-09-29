@@ -8,6 +8,7 @@ import {
   DailyProfitEstimate
 } from '../types';
 import { COMMODITIES } from '../data/commodities';
+import { ProduceBadge, ProduceIcon } from './ProduceBadge';
 import { PricingEngine } from '../services/pricing';
 import { t, speakText } from '../utils/i18n';
 import { SoundEffects } from '../utils/audioHaptics';
@@ -334,10 +335,8 @@ export const DailyProfitCalculator: React.FC<DailyProfitCalculatorProps> = ({
                   <Sparkles className="w-4 h-4" />
                 </span>
               </div>
-              <div className="text-xl sm:text-2xl font-black text-slate-900 mt-2 flex items-center gap-1.5 truncate">
-                <span className="text-2xl">
-                  {COMMODITIES[profitEstimate.topProfitCommodity]?.iconEmoji}
-                </span>
+              <div className="text-xl sm:text-2xl font-black text-slate-900 mt-2 flex items-center gap-2.5 truncate">
+                <ProduceBadge commodity={profitEstimate.topProfitCommodity} size="sm" />
                 <span className="truncate">
                   {lang === 'ta'
                     ? COMMODITIES[profitEstimate.topProfitCommodity]?.nameTa
@@ -439,10 +438,12 @@ export const DailyProfitCalculator: React.FC<DailyProfitCalculatorProps> = ({
                                     : 'bg-orange-500'
                         }`}
                       />
-                      <span>
-                        {COMMODITIES[it.commodity]?.iconEmoji}{' '}
-                        {lang === 'ta' ? COMMODITIES[it.commodity]?.nameTa : it.commodity}:
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <ProduceIcon commodity={it.commodity} className="w-3.5 h-3.5" />
+                        <span>
+                          {lang === 'ta' ? COMMODITIES[it.commodity]?.nameTa : it.commodity}:
+                        </span>
+                      </div>
                       <span className="font-mono font-bold text-slate-900">
                         ₹{it.potentialProfit.toLocaleString()}
                       </span>
@@ -477,8 +478,8 @@ export const DailyProfitCalculator: React.FC<DailyProfitCalculatorProps> = ({
                   return (
                     <tr key={it.commodity} className="hover:bg-slate-50/80 transition-colors">
                       {/* 1. Produce Name */}
-                      <td className="py-3 px-3 font-semibold text-slate-900 flex items-center gap-2">
-                        <span className="text-xl">{cMeta?.iconEmoji}</span>
+                      <td className="py-3 px-3 font-semibold text-slate-900 flex items-center gap-2.5">
+                        <ProduceBadge commodity={it.commodity} size="sm" />
                         <div>
                           <div className="font-bold">{lang === 'ta' ? cMeta?.nameTa : cMeta?.nameEn}</div>
                           <span className="text-[10px] text-slate-400 font-normal">{it.commodity}</span>

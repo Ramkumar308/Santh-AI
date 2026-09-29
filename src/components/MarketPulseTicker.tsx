@@ -62,29 +62,29 @@ export const MarketPulseTicker: React.FC<MarketPulseTickerProps> = ({
                   SoundEffects.playClick();
                   if (onSelectCommodity) onSelectCommodity(rec.commodity);
                 }}
-                className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border text-left transition-all shrink-0 cursor-pointer ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-left transition-all shrink-0 cursor-pointer btn-press ${
                   isSelected
-                    ? 'bg-emerald-950/80 border-emerald-500/80 text-white ring-1 ring-emerald-500/50'
-                    : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/70 text-slate-200 hover:border-slate-600'
+                    ? 'bg-emerald-950/90 border-emerald-500 text-white ring-2 ring-emerald-500/40 shadow-xs'
+                    : 'bg-slate-800/90 hover:bg-slate-800 border-slate-700/80 text-slate-200 hover:border-slate-500 shadow-2xs'
                 }`}
                 title={`Click to inspect ${meta.nameEn} pricing and stock details`}
               >
-                <span className="text-sm shrink-0">{meta.iconEmoji}</span>
+                <span className="text-sm shrink-0 drop-shadow-xs">{meta.iconEmoji}</span>
                 <div className="flex items-baseline gap-1.5 leading-tight">
-                  <span className="font-semibold text-white">
+                  <span className="font-bold text-white text-xs">
                     {lang === 'ta' ? meta.nameTa : meta.nameEn}
                   </span>
                   <span className="text-slate-400 text-[10px] hidden md:inline truncate max-w-[90px]">
                     {rec.market.replace(' Wholesale', '').replace(' Market', '')}
                   </span>
-                  <span className="font-mono font-bold text-emerald-400 text-xs">
+                  <span className="font-mono font-bold text-emerald-400 text-xs tabular-nums">
                     ₹{rec.modalPricePerKg}
                   </span>
                   <span className="text-[10px] text-slate-400">/kg</span>
                 </div>
 
                 <span
-                  className={`text-[9px] font-bold px-1.5 py-0.5 rounded border leading-none flex items-center gap-0.5 ${trend.color}`}
+                  className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border leading-none flex items-center gap-0.5 ${trend.color}`}
                 >
                   {trend.dir === 'up' && <TrendingUp className="w-2.5 h-2.5" />}
                   {trend.dir === 'down' && <TrendingDown className="w-2.5 h-2.5" />}

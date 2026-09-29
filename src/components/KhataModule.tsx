@@ -21,9 +21,11 @@ import {
   Info,
   DollarSign,
   UserPlus,
-  Printer
+  Printer,
+  QrCode
 } from 'lucide-react';
 import { ThermalReceiptModal } from './ThermalReceiptModal';
+import { KhataUpiQrModal } from './KhataUpiQrModal';
 import { SoundEffects } from '../utils/audioHaptics';
 import confetti from 'canvas-confetti';
 
@@ -47,11 +49,23 @@ export const KhataModule: React.FC<KhataModuleProps> = ({
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>(customers[0]?.id || '');
   const [isNewTxModalOpen, setIsNewTxModalOpen] = useState<boolean>(false);
   const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState<boolean>(false);
+  const [isUpiQrModalOpen, setIsUpiQrModalOpen] = useState<boolean>(false);
 
   // Thermal Slip & Receipt Modal state (for non-WhatsApp / elderly / cash customers)
   const [receiptCustomer, setReceiptCustomer] = useState<KhataCustomer | null>(null);
   const [receiptBillAmount, setReceiptBillAmount] = useState<number>(0);
   const [receiptPaymentAmount, setReceiptPaymentAmount] = useState<number>(0);
+
+  const handleUpiSettle = (customerId: string, amount: number) => {
+    const today = new Date().toISOString().split('T')[0];
+    onAddTransaction(customerId, {
+      date: today,
+      type: 'PAYMENT',
+      amount: amount,
+      itemsDescription: 'UPI Instant Scan Settlement',
+      daysDelayed: 0
+    });
+  };
 
   // New Transaction form state
   const [txType, setTxType] = useState<'CREDIT' | 'PAYMENT'>('PAYMENT');
@@ -292,6 +306,18 @@ export const KhataModule: React.FC<KhataModuleProps> = ({
                   <button
                     onClick={() => {
                       SoundEffects.playClick();
+                      setIsUpiQrModalOpen(true);
+                    }}
+                    className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors"
+                    title="Instant UPI Payment QR"
+                  >
+                    <QrCode className="w-4 h-4 text-emerald-400" />
+                    <span>{lang === 'ta' ? 'UPI ஸ்கேன்' : 'Scan to Pay'}</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      SoundEffects.playClick();
                       setReceiptCustomer(selectedCustomer);
                       setReceiptBillAmount(0);
                       setReceiptPaymentAmount(0);
@@ -399,8 +425,22 @@ export const KhataModule: React.FC<KhataModuleProps> = ({
               </div>
             </div>
 
-            {/* Action Bar: WhatsApp Reminder & Physical Thermal Slip / UPI QR */}
-            <div className="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {/* Action Bar: Instant UPI Scan, WhatsApp Reminder & Physical Thermal Slip */}
+            <div className="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <button
+                type="button"
+                onClick={() => {
+                  SoundEffects.playClick();
+                  setIsUpiQrModalOpen(true);
+                }}
+                className="py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors"
+              >
+                <QrCode className="w-4 h-4 text-emerald-400" />
+                <span>
+                  {lang === 'ta' ? 'ஸ்கேன் செய்து செலுத்து (UPI)' : 'Scan to Pay (UPI QR)'}
+                </span>
+              </button>
+
               <a
                 href={KhataService.createReminderWhatsAppUrl(selectedCustomer, vendorProfile, lang)}
                 target="_blank"
@@ -416,6 +456,7 @@ export const KhataModule: React.FC<KhataModuleProps> = ({
               </a>
 
               <button
+                type="button"
                 onClick={() => {
                   SoundEffects.playClick();
                   setReceiptCustomer(selectedCustomer);
@@ -426,7 +467,7 @@ export const KhataModule: React.FC<KhataModuleProps> = ({
               >
                 <Printer className="w-4 h-4 text-indigo-600" />
                 <span>
-                  {lang === 'ta' ? 'அச்சு ரசீது / UPI QR' : 'Thermal Slip / UPI QR'}
+                  {lang === 'ta' ? 'அச்சு ரசீது (58/80mm)' : 'Thermal Slip (58/80mm)'}
                 </span>
               </button>
             </div>
@@ -617,6 +658,17 @@ export const KhataModule: React.FC<KhataModuleProps> = ({
             </form>
           </div>
         </div>
+      )}
+
+      {/* Instant UPI QR Scan to Pay Modal */}
+      {isUpiQrModalOpen && selectedCustomer && (
+        <KhataUpiQrModal
+          customer={selectedCustomer}
+          vendorProfile={vendorProfile}
+          lang={lang}
+          onClose={() => setIsUpiQrModalOpen(false)}
+          onSettlePayment={handleUpiSettle}
+        />
       )}
 
       {/* Physical Thermal Receipt / Cash Slip / UPI QR Modal */}

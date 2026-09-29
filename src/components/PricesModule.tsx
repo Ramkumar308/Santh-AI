@@ -9,6 +9,7 @@ import {
   KhataCustomer
 } from '../types';
 import { COMMODITIES } from '../data/commodities';
+import { ProduceBadge, ProduceIcon } from './ProduceBadge';
 import { PricingEngine } from '../services/pricing';
 import { t, speakText } from '../utils/i18n';
 import {
@@ -31,11 +32,13 @@ import {
   Truck,
   Scale,
   Percent,
-  Zap
+  Zap,
+  Globe
 } from 'lucide-react';
 import { SoundEffects } from '../utils/audioHaptics';
 import confetti from 'canvas-confetti';
 import { DailyProfitCalculator } from './DailyProfitCalculator';
+import { MandiSearchGrounding } from './MandiSearchGrounding';
 import {
   BarChart,
   Bar,
@@ -74,6 +77,7 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<'All' | CommodityType>('All');
   const [showMandiTable, setShowMandiTable] = useState<boolean>(false);
+  const [showSearchGrounding, setShowSearchGrounding] = useState<boolean>(false);
   const [showRetailCalculator, setShowRetailCalculator] = useState<boolean>(true);
   const [freightPerKg, setFreightPerKg] = useState<number>(2.0);
   const [shrinkagePct, setShrinkagePct] = useState<number>(8.0);
@@ -165,10 +169,25 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+          <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap">
+            <button
+              onClick={() => {
+                SoundEffects.playClick();
+                setShowSearchGrounding(!showSearchGrounding);
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                showSearchGrounding
+                  ? 'bg-blue-500/25 text-blue-200 border border-blue-400/40 shadow-xs'
+                  : 'bg-slate-800 hover:bg-slate-700 text-blue-300 border border-blue-500/30'
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5 text-blue-400" />
+              <span>{showSearchGrounding ? (lang === 'ta' ? 'தேடலை மூடு' : 'Hide Web Search') : (lang === 'ta' ? 'கூகுள் நேரலை ஆய்வு' : 'Google Search Intel')}</span>
+            </button>
+
             <button
               onClick={() => setShowMandiTable(!showMandiTable)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
                 showMandiTable
                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                   : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
@@ -181,7 +200,7 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
             <button
               onClick={onRefreshPrices}
               disabled={isRefreshing}
-              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs"
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>{isRefreshing ? 'Syncing...' : '⚡ Fetch Real-Time Rates'}</span>
@@ -217,6 +236,13 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Real-Time Google Search Grounding for Mandi Intelligence */}
+      {showSearchGrounding && (
+        <div className="animate-in fade-in duration-300">
+          <MandiSearchGrounding lang={lang} />
+        </div>
+      )}
 
       {/* MANDI MARKET DEPTH TABLE (Collapsible / Toggleable) */}
       {showMandiTable && (
@@ -257,7 +283,10 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
                       <span className="text-[10px] text-slate-400 font-normal">{r.district}</span>
                     </td>
                     <td className="py-2.5 px-3 font-medium text-slate-700">
-                      {COMMODITIES[r.commodity]?.iconEmoji} {r.commodity}
+                      <div className="flex items-center gap-2">
+                        <ProduceBadge commodity={r.commodity} size="xs" />
+                        <span>{r.commodity}</span>
+                      </div>
                     </td>
                     <td className="py-2.5 px-3 font-mono font-bold text-slate-700">
                       {r.arrivalTons ? `${r.arrivalTons} T` : '—'}
@@ -571,8 +600,8 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
 
                     return (
                       <tr key={comm} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-3 font-semibold text-slate-900 flex items-center gap-2">
-                          <span className="text-lg">{cMeta.iconEmoji}</span>
+                        <td className="py-3 px-3 font-semibold text-slate-900 flex items-center gap-2.5">
+                          <ProduceBadge commodity={comm} size="sm" />
                           <div>
                             <div>{lang === 'ta' ? cMeta.nameTa : cMeta.nameEn}</div>
                             <span className="text-[10px] text-slate-400 font-normal">{comm}</span>
@@ -657,7 +686,7 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                <span>{cMeta.iconEmoji}</span>
+                <ProduceIcon commodity={comm} className="w-4 h-4" />
                 <span>{lang === 'ta' ? cMeta.nameTa : cMeta.nameEn}</span>
               </button>
             );
@@ -688,19 +717,17 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
           return (
             <div
               key={comm}
-              className={`bg-white rounded-3xl border p-5 shadow-xs transition-all ${
+              className={`bg-white rounded-3xl border p-5 shadow-2xs hover-lift card-sheen transition-all ${
                 evaluation.isOutlier
                   ? evaluation.outlierType === 'gouging'
                     ? 'border-rose-300 ring-2 ring-rose-100'
                     : 'border-amber-300'
-                  : 'border-slate-200'
+                  : 'border-slate-200/90'
               }`}
             >
               <div className="flex items-start justify-between pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="text-3xl p-2 rounded-2xl bg-slate-50 border border-slate-100">
-                    {cMeta.iconEmoji}
-                  </div>
+                  <ProduceBadge commodity={comm} size="lg" />
                   <div>
                     <h3 className="font-extrabold text-lg text-slate-900">
                       {lang === 'ta' ? cMeta.nameTa : cMeta.nameEn}

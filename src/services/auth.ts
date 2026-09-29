@@ -1,6 +1,8 @@
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { VendorProfile } from '../types';
 import { DEFAULT_VENDOR } from '../data/commodities';
+import { FirebaseService, auth } from './firebase';
+import { User, NextOrObserver, Unsubscribe } from 'firebase/auth';
 
 const supabaseUrl = typeof import.meta !== 'undefined' ? import.meta.env?.VITE_SUPABASE_URL : '';
 const supabaseAnonKey = typeof import.meta !== 'undefined' ? import.meta.env?.VITE_SUPABASE_ANON_KEY : '';
@@ -23,6 +25,18 @@ export class AuthService {
     return Boolean(supabase);
   }
 
+  public static isFirebaseAuthenticated(): boolean {
+    return Boolean(auth.currentUser);
+  }
+
+  public static getFirebaseUser(): User | null {
+    return auth.currentUser;
+  }
+
+  public static onAuthStateChanged(observer: NextOrObserver<User>): Unsubscribe {
+    return FirebaseService.onAuthStateChanged(observer);
+  }
+
   public static getCurrentProfile(): VendorProfile {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
@@ -38,46 +52,46 @@ export class AuthService {
   public static saveProfile(profile: VendorProfile): void {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(profile));
+      if (auth.currentUser) {
+        FirebaseService.saveVendorProfile(auth.currentUser.uid, profile);
+      }
     } catch (e) {
       console.warn('Failed to store vendor profile', e);
     }
   }
 
-  public static async signInWithGoogle(): Promise<{ success: boolean; error?: string }> {
-    if (supabase) {
-      try {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: window.location.origin
-          }
-        });
-        if (error) throw error;
-        return { success: true };
-      } catch (err: any) {
-        console.warn('[SanthAI Auth] Supabase Google Auth error:', err);
-        return { success: false, error: err?.message || 'Google Auth Error' };
+  public static async signInWithGoogle(): Promise<{ success: boolean; user?: User; error?: string }> {
+    // 1. Firebase Google Auth
+    try {
+      const result = await FirebaseService.signInWithGoogle();
+      if (result.success && result.user) {
+        const user = result.user;
+        const currentProfile = this.getCurrentProfile();
+        const updatedProfile: VendorProfile = {
+          ...currentProfile,
+          id: user.uid,
+          name: user.displayName || currentProfile.name,
+          email: user.email || currentProfile.email,
+          photoUrl: user.photoURL || undefined,
+          photoURL: user.photoURL || undefined,
+          isSimulatedAuth: false
+        };
+        this.saveProfile(updatedProfile);
+        return { success: true, user };
       }
-    } else {
-      // Prototype Instant Login mode: Simulate signed in state with Google user metadata
-      const simulatedGoogleVendor: VendorProfile = {
-        id: 'google_vendor_01',
-        name: 'Ramkumar K. S. (Market Vendor)',
-        phone: '9840123456',
-        marketName: 'Koyambedu Wholesale Market, Chennai',
-        stallNumber: 'Shop B-42',
-        upiId: 'ramkumar.veg@okaxis',
-        closingTimeStr: '19:30',
-        marketClosingHour: 19,
-        email: 'ksramkumar2148@gmail.com',
-        isSimulatedAuth: true
-      };
-      this.saveProfile(simulatedGoogleVendor);
-      return { success: true };
+      if (result.error) {
+        return { success: false, error: result.error };
+      }
+    } catch (err: any) {
+      console.warn('[SanthAI Auth] Firebase Google Auth error:', err);
+      return { success: false, error: err?.message || 'Google Auth Error' };
     }
+
+    return { success: false, error: 'Sign-in incomplete' };
   }
 
   public static async signOut(): Promise<void> {
+    await FirebaseService.signOutVendor();
     if (supabase) {
       try {
         await supabase.auth.signOut();

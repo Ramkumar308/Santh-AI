@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // User profile and private stall collections (Stock logs, Khata ledgers)
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      match /stock_logs/{logId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /khata_customers/{customerId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /{allSubcollections=**} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // ResQ Lots (Marketplace clearance)
+    match /resq_lots/{lotId} {
+      allow read: if true;
+      allow create, update: if isValidId(lotId)
+        && request.resource.data.commodity is string
+        && request.resource.data.vendorName is string
+        && request.resource.data.unsoldKg is number
+        && request.resource.data.status in ['available', 'reserved', 'sold', 'expired'];
+      allow delete: if isValidId(lotId);
+
+      // ResQ Real-time Messages subcollection
+      match /messages/{messageId} {
+        allow read: if true;
+        allow create: if isValidId(lotId) && isValidId(messageId)
+          && request.resource.data.lotId == lotId
+          && request.resource.data.senderRole in ['vendor', 'buyer']
+          && request.resource.data.senderName is string
+          && request.resource.data.type in ['chat', 'counter_offer', 'accept_offer', 'reserve', 'payment_proof', 'system']
+          && request.resource.data.text is string;
+        allow update: if isValidId(lotId) && isValidId(messageId)
+          && request.resource.data.lotId == lotId;
+        allow delete: if false;
+      }
+    }
+
+    // Default catch-all
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

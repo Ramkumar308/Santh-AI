@@ -8,6 +8,7 @@ import {
   DemandForecast
 } from '../types';
 import { COMMODITIES } from '../data/commodities';
+import { ProduceBadge, ProduceIcon } from './ProduceBadge';
 import { ForecastEngine } from '../services/forecast';
 import { t, speakText } from '../utils/i18n';
 import {
@@ -159,7 +160,7 @@ export const StockModule: React.FC<StockModuleProps> = ({
       {/* Hero Dual Cards Grid matching uploaded image */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left Hero Card: Tomorrow's Plan */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-[#e3ece2] p-6 sm:p-7 shadow-2xs relative flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white rounded-3xl border border-[#e3ece2] p-6 sm:p-7 shadow-2xs hover-lift card-sheen relative flex flex-col justify-between">
           <div>
             {/* Top row: Pill badge & Confidence Dark Badge */}
             <div className="flex items-start justify-between gap-4">
@@ -239,7 +240,7 @@ export const StockModule: React.FC<StockModuleProps> = ({
         </div>
 
         {/* Right Hero Card: Sold vs Unsold Bar Chart */}
-        <div className="lg:col-span-5 bg-white rounded-3xl border border-[#e3ece2] p-6 sm:p-7 shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white rounded-3xl border border-[#e3ece2] p-6 sm:p-7 shadow-2xs hover-lift card-sheen flex flex-col justify-between">
           <div>
             {/* Top row with week label and -38% waste pill */}
             <div className="flex items-start justify-between gap-2">
@@ -377,7 +378,7 @@ export const StockModule: React.FC<StockModuleProps> = ({
                     : 'bg-white text-slate-700 border-[#e3ece2] hover:bg-slate-50'
                 }`}
               >
-                <span className="text-2xl">{cMeta.iconEmoji}</span>
+                <ProduceBadge commodity={comm} size="sm" showBadge={!isSelected} className={isSelected ? 'bg-white/20 border-white/30' : ''} />
                 <div className="text-left">
                   <div className="text-sm leading-tight font-bold">
                     {lang === 'ta' ? cMeta.nameTa : cMeta.nameEn}
@@ -445,8 +446,8 @@ export const StockModule: React.FC<StockModuleProps> = ({
         {/* Selected Commodity Quick Stats & Recent Daily Logs */}
         <div className="bg-white rounded-3xl border border-[#e3ece2] p-5 shadow-2xs">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">{meta.iconEmoji}</span>
+            <div className="flex items-center gap-2.5">
+              <ProduceBadge commodity={selectedCommodity} size="sm" />
               <h3 className="font-bold text-sm sm:text-base text-slate-900">
                 {lang === 'ta'
                   ? `${meta.nameTa} - சமீபத்திய விற்பனை பதிவுகள்`
@@ -506,8 +507,8 @@ export const StockModule: React.FC<StockModuleProps> = ({
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl border border-slate-200 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{meta.iconEmoji}</span>
+              <div className="flex items-center gap-2.5">
+                <ProduceBadge commodity={selectedCommodity} size="md" />
                 <h3 className="font-bold text-lg text-slate-900">
                   {t(lang, 'logTodayStock')} — {lang === 'ta' ? meta.nameTa : meta.nameEn}
                 </h3>

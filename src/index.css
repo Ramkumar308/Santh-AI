@@ -32,27 +32,32 @@
    Rich, Attractive Multi-Palette Market Canvas Themes
    ========================================================================= */
 
-/* 1. Fresh Farm Emerald (Default) - Matching uploaded reference screenshot palette */
+/* 1. Fresh Farm Emerald (Default) - Crisp lush agricultural emerald canvas */
 .theme-emerald,
 body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):not(.theme-amethyst):not(.theme-midnight) {
-  background-color: #f3f6f2;
+  background-color: #f1f6f2;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(24, 58, 39, 0.05) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(22, 163, 74, 0.06) 0px, transparent 50%),
-    radial-gradient(at 50% 30%, rgba(232, 245, 236, 0.5) 0px, transparent 65%),
-    radial-gradient(at 85% 90%, rgba(245, 158, 11, 0.04) 0px, transparent 55%);
+    radial-gradient(circle, rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.14) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(5, 150, 105, 0.12) 0px, transparent 45%),
+    radial-gradient(at 50% 25%, rgba(220, 252, 231, 0.65) 0px, transparent 65%),
+    radial-gradient(at 85% 85%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
+    radial-gradient(at 15% 90%, rgba(13, 148, 136, 0.08) 0px, transparent 50%);
+  background-size: 26px 26px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-attachment: fixed;
 }
 
-/* 2. Golden Harvest - Warm radiant saffron amber, marigold gold, and festive harvest glow */
+/* 2. Golden Harvest - Warm radiant saffron amber, sunlit turmeric, and festive harvest glow */
 .theme-golden {
-  background-color: #fcf6ea;
+  background-color: #faf5eb;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.32) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(234, 88, 12, 0.26) 0px, transparent 50%),
-    radial-gradient(at 50% 35%, rgba(251, 191, 36, 0.22) 0px, transparent 65%),
-    radial-gradient(at 85% 90%, rgba(217, 119, 6, 0.20) 0px, transparent 55%),
-    radial-gradient(at 10% 85%, rgba(16, 185, 129, 0.16) 0px, transparent 50%);
+    radial-gradient(circle, rgba(180, 83, 9, 0.045) 1px, transparent 1px),
+    radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.24) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(234, 88, 12, 0.18) 0px, transparent 50%),
+    radial-gradient(at 50% 25%, rgba(254, 243, 199, 0.65) 0px, transparent 65%),
+    radial-gradient(at 85% 85%, rgba(217, 119, 6, 0.15) 0px, transparent 55%),
+    radial-gradient(at 15% 85%, rgba(16, 185, 129, 0.10) 0px, transparent 50%);
+  background-size: 26px 26px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-attachment: fixed;
 }
 
@@ -60,11 +65,13 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
 .theme-ocean {
   background-color: #edf7fa;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.30) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(20, 184, 166, 0.28) 0px, transparent 50%),
-    radial-gradient(at 50% 35%, rgba(99, 102, 241, 0.18) 0px, transparent 65%),
-    radial-gradient(at 85% 90%, rgba(6, 182, 212, 0.22) 0px, transparent 55%),
-    radial-gradient(at 10% 85%, rgba(16, 185, 129, 0.16) 0px, transparent 50%);
+    radial-gradient(circle, rgba(14, 165, 233, 0.045) 1px, transparent 1px),
+    radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.22) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(20, 184, 166, 0.18) 0px, transparent 50%),
+    radial-gradient(at 50% 25%, rgba(224, 242, 254, 0.65) 0px, transparent 65%),
+    radial-gradient(at 85% 85%, rgba(6, 182, 212, 0.16) 0px, transparent 55%),
+    radial-gradient(at 15% 85%, rgba(99, 102, 241, 0.10) 0px, transparent 50%);
+  background-size: 26px 26px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-attachment: fixed;
 }
 
@@ -72,11 +79,13 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
 .theme-sunset {
   background-color: #fdf3f2;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(244, 63, 94, 0.28) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.26) 0px, transparent 50%),
-    radial-gradient(at 50% 35%, rgba(251, 146, 60, 0.20) 0px, transparent 65%),
-    radial-gradient(at 85% 90%, rgba(168, 85, 247, 0.20) 0px, transparent 55%),
-    radial-gradient(at 10% 85%, rgba(244, 63, 94, 0.20) 0px, transparent 50%);
+    radial-gradient(circle, rgba(244, 63, 94, 0.045) 1px, transparent 1px),
+    radial-gradient(at 0% 0%, rgba(244, 63, 94, 0.20) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.18) 0px, transparent 50%),
+    radial-gradient(at 50% 25%, rgba(254, 226, 226, 0.65) 0px, transparent 65%),
+    radial-gradient(at 85% 85%, rgba(168, 85, 247, 0.14) 0px, transparent 55%),
+    radial-gradient(at 15% 85%, rgba(244, 63, 94, 0.12) 0px, transparent 50%);
+  background-size: 26px 26px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-attachment: fixed;
 }
 
@@ -84,32 +93,60 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
 .theme-amethyst {
   background-color: #f7f3fd;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.30) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.28) 0px, transparent 50%),
-    radial-gradient(at 50% 35%, rgba(236, 72, 153, 0.20) 0px, transparent 65%),
-    radial-gradient(at 85% 90%, rgba(139, 92, 246, 0.24) 0px, transparent 55%),
-    radial-gradient(at 10% 85%, rgba(14, 165, 233, 0.18) 0px, transparent 50%);
+    radial-gradient(circle, rgba(168, 85, 247, 0.045) 1px, transparent 1px),
+    radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.22) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.18) 0px, transparent 50%),
+    radial-gradient(at 50% 25%, rgba(243, 232, 255, 0.65) 0px, transparent 65%),
+    radial-gradient(at 85% 85%, rgba(139, 92, 246, 0.16) 0px, transparent 55%),
+    radial-gradient(at 15% 85%, rgba(236, 72, 153, 0.12) 0px, transparent 50%);
+  background-size: 26px 26px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-attachment: fixed;
 }
 
 /* 6. Midnight Bazaar - Premium dark luxury night market aesthetic with neon bioluminescence */
 .theme-midnight {
-  background-color: #070d18;
+  background-color: #070c18;
   background-image: 
-    radial-gradient(at 5% 5%, rgba(16, 185, 129, 0.28) 0px, transparent 55%),
-    radial-gradient(at 95% 5%, rgba(245, 158, 11, 0.22) 0px, transparent 50%),
-    radial-gradient(at 50% 30%, rgba(99, 102, 241, 0.22) 0px, transparent 65%),
-    radial-gradient(at 85% 85%, rgba(14, 165, 233, 0.22) 0px, transparent 60%),
-    radial-gradient(at 10% 85%, rgba(236, 72, 153, 0.18) 0px, transparent 55%);
+    radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    radial-gradient(at 5% 5%, rgba(16, 185, 129, 0.24) 0px, transparent 55%),
+    radial-gradient(at 95% 5%, rgba(245, 158, 11, 0.20) 0px, transparent 50%),
+    radial-gradient(at 50% 30%, rgba(99, 102, 241, 0.20) 0px, transparent 65%),
+    radial-gradient(at 85% 85%, rgba(14, 165, 233, 0.20) 0px, transparent 60%),
+    radial-gradient(at 15% 85%, rgba(236, 72, 153, 0.16) 0px, transparent 55%);
+  background-size: 26px 26px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-attachment: fixed;
   color: #f8fafc;
 }
 
 /* Midnight Dark Overrides */
 .theme-midnight .bg-white {
-  background-color: #0f1927 !important;
+  background-color: #0f172a !important;
   color: #f8fafc !important;
-  border-color: #1e2f44 !important;
+  border-color: #1e293b !important;
+}
+
+.theme-midnight .bg-white\/70,
+.theme-midnight .bg-white\/80,
+.theme-midnight .bg-white\/85,
+.theme-midnight .bg-white\/90,
+.theme-midnight .bg-white\/95 {
+  background-color: rgba(15, 23, 42, 0.88) !important;
+  color: #f8fafc !important;
+  border-color: rgba(30, 41, 59, 0.9) !important;
+}
+
+.theme-midnight .bg-\[\#f8faf7\] {
+  background-color: #0b1120 !important;
+  border-color: #1e293b !important;
+}
+
+.theme-midnight .bg-\[\#eaf4ec\] {
+  background-color: #0c1a16 !important;
+  border-color: #134e35 !important;
+}
+
+.theme-midnight .border-\[\#e3ece2\] {
+  border-color: #1e293b !important;
 }
 
 .theme-midnight .bg-slate-50,
@@ -118,8 +155,16 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
 .theme-midnight .bg-slate-100,
 .theme-midnight .bg-slate-100\/80,
 .theme-midnight .bg-slate-100\/90 {
-  background-color: #152234 !important;
-  border-color: #22374e !important;
+  background-color: #131c31 !important;
+  border-color: #1e2d4a !important;
+}
+
+.theme-midnight .border-slate-200,
+.theme-midnight .border-slate-200\/70,
+.theme-midnight .border-slate-200\/80,
+.theme-midnight .border-slate-200\/90,
+.theme-midnight .border-slate-100 {
+  border-color: #1e2d4a !important;
 }
 
 .theme-midnight .text-slate-900 {
@@ -134,40 +179,82 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
   color: #cbd5e1 !important;
 }
 
-.theme-midnight .text-slate-600,
-.theme-midnight .text-slate-500 {
+.theme-midnight .text-slate-600 {
   color: #94a3b8 !important;
 }
 
-.theme-midnight .bg-slate-900 {
-  background-color: #050a12 !important;
+.theme-midnight .text-slate-500 {
+  color: #8292ab !important;
 }
 
-/* Enhanced Frosted Glass & Surface Polish */
+.theme-midnight .text-slate-400 {
+  color: #64748b !important;
+}
+
+.theme-midnight .bg-slate-900 {
+  background-color: #050914 !important;
+}
+
+.theme-midnight input,
+.theme-midnight select,
+.theme-midnight textarea {
+  background-color: #0d1527 !important;
+  color: #f8fafc !important;
+  border-color: #243552 !important;
+}
+
+.theme-midnight input:focus,
+.theme-midnight select:focus,
+.theme-midnight textarea:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25) !important;
+}
+
+/* =========================================================================
+   UI Craft & Micro-Interactions
+   ========================================================================= */
+
+/* Frosted Glass Panels */
 .glass-panel {
-  background-color: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+  background-color: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 30px -4px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
 }
 
 .theme-midnight .glass-panel {
-  background-color: rgba(15, 25, 39, 0.92);
-  border-color: rgba(36, 52, 71, 0.8);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+  background-color: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(30, 41, 59, 0.85);
+  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.5);
 }
 
-/* Attractive Micro-Interactions & Elevation */
+/* Interactive Card Elevation & Polish */
 .hover-lift {
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease;
 }
 
 .hover-lift:hover {
-  transform: translateY(-2.5px);
-  box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.10), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
 }
 
+.hover-lift:active {
+  transform: translateY(0);
+}
+
+/* Tactile button press feedback */
+.btn-press {
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.12s ease;
+}
+
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* Card Upper Sheen Border Highlight */
 .card-sheen {
   position: relative;
   overflow: hidden;
@@ -180,19 +267,23 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
   pointer-events: none;
 }
 
-/* Attractive Expressive Gradient Text Utilities */
+.theme-midnight .card-sheen::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+}
+
+/* Expressive Gradient Text Utilities */
 .text-gradient-emerald {
-  background: linear-gradient(135deg, #047857 0%, #059669 50%, #0d9488 100%);
+  background: linear-gradient(135deg, #065f46 0%, #059669 50%, #0d9488 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #ea580c 100%);
+  background: linear-gradient(135deg, #9a3412 0%, #d97706 50%, #ea580c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -203,16 +294,51 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-sunset {
-  background: linear-gradient(135deg, #be123c 0%, #e11d48 50%, #ea580c 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Glow Shadows */
+.glow-emerald {
+  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.25);
 }
 
-.text-gradient-amethyst {
-  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #db2777 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.glow-amber {
+  box-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.25);
+}
+
+/* =========================================================================
+   Active Stall Organic Breathing Ring Animation
+   Natural respiration cycle (3s) to gently draw attention to alerts/surplus
+   ========================================================================= */
+@keyframes ringBreathe {
+  0%, 100% {
+    transform: scale(0.97);
+    opacity: 0.55;
+    filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.4));
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 0.96;
+    filter: drop-shadow(0 0 14px rgba(52, 211, 153, 0.85)) drop-shadow(0 0 22px rgba(45, 212, 191, 0.55));
+  }
+}
+
+@keyframes innerIconBreathe {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.45), 0 3px 6px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: inset 0 1.5px 3px rgba(255, 255, 255, 0.7), 0 0 12px rgba(52, 211, 153, 0.55), 0 4px 10px rgba(0, 0, 0, 0.6);
+  }
+}
+
+.animate-ring-breathe {
+  animation: ringBreathe 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, opacity, filter;
+}
+
+.animate-inner-breathe {
+  animation: innerIconBreathe 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, box-shadow;
 }
 
 /* Custom Scrollbars */
@@ -222,7 +348,7 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(241, 245, 249, 0.8);
+  background: rgba(241, 245, 249, 0.5);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -234,6 +360,18 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
   background: #94a3b8;
 }
 
+.theme-midnight ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.theme-midnight ::-webkit-scrollbar-thumb {
+  background: #243552;
+}
+
+.theme-midnight ::-webkit-scrollbar-thumb:hover {
+  background: #334769;
+}
+
 /* Outdoor Sunlight High-Contrast Mode for bright open-air vegetable mandis */
 .outdoor-mode {
   filter: contrast(1.15);
@@ -243,12 +381,12 @@ body:not(.outdoor-mode):not(.theme-golden):not(.theme-ocean):not(.theme-sunset):
 
 .outdoor-mode .bg-white {
   background-color: #ffffff !important;
-  border-color: #334155 !important;
+  border-color: #0f172a !important;
 }
 
 .outdoor-mode .text-slate-500,
 .outdoor-mode .text-slate-400 {
-  color: #1e293b !important;
+  color: #0f172a !important;
   font-weight: 600 !important;
 }
 

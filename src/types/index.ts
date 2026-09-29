@@ -160,6 +160,60 @@ export interface BulkOrderBoardItem {
   notes: string;
 }
 
+export type ResQUserRole = 'vendor' | 'buyer';
+
+export interface BuyerProfile {
+  id: string;
+  name: string;
+  organization: string;
+  type: 'Mess' | 'Hostel' | 'Charity' | 'Canteen' | 'Restaurant';
+  phone: string;
+  distanceKm: number;
+}
+
+export interface ResQChatMessage {
+  id: string;
+  lotId: string;
+  senderRole: ResQUserRole;
+  senderName: string;
+  senderId: string;
+  type: 'chat' | 'counter_offer' | 'accept_offer' | 'reject_offer' | 'reserve' | 'payment_settled' | 'system';
+  text: string;
+  proposedPricePerKg?: number;
+  proposedKg?: number;
+  settlementAmount?: number;
+  status?: 'pending' | 'accepted' | 'rejected';
+  timestamp: number;
+}
+
+export interface ResQLotItem {
+  id: string;
+  commodity: CommodityType;
+  vendorName: string;
+  vendorStall: string;
+  vendorPhone: string;
+  vendorVpa: string;
+  unsoldKg: number;
+  normalPricePerKg: number;
+  suggestedMarkdownPrice: number;
+  discountPercent: number;
+  status: 'available' | 'reserved' | 'sold' | 'expired';
+  reservedBy?: string;
+  reservedBuyerName?: string;
+  reservedKg?: number;
+  agreedPricePerKg?: number;
+  settledAmount?: number;
+  paymentStatus?: 'pending' | 'settled';
+  createdAt: number;
+  marketClosesAt: string;
+  potentialSavedRupees: number;
+  lastMessagePreview?: string;
+  lastMessageTime?: number;
+  unreadCountVendor?: number;
+  unreadCountBuyer?: number;
+}
+
+
 export interface KhataTransaction {
   id: string;
   date: string;
@@ -198,7 +252,10 @@ export interface VendorProfile {
   marketClosingHour: number; // 19 (7 PM)
   email?: string;
   photoUrl?: string;
+  photoURL?: string;
   isSimulatedAuth?: boolean;
 }
 
 export type BgTheme = 'emerald' | 'golden' | 'ocean' | 'sunset' | 'amethyst' | 'midnight';
+
+export type ActiveTab = 'stock' | 'prices' | 'resq' | 'khata' | 'aistudio';

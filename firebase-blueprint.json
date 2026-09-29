@@ -1,0 +1,129 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with vendor stall credentials and Google account information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "phone": { "type": "string" },
+        "stallNumber": { "type": "string" },
+        "marketName": { "type": "string" },
+        "district": { "type": "string" },
+        "closingTimeStr": { "type": "string" },
+        "isSimulatedAuth": { "type": "boolean" },
+        "lastSyncedAt": { "type": "string" }
+      },
+      "required": ["id", "name"]
+    },
+    "StockLogItem": {
+      "title": "StockLogItem",
+      "description": "Daily commodity stock arrival, sale, and wastage log entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "commodity": { "type": "string" },
+        "date": { "type": "string" },
+        "arrivedKg": { "type": "number" },
+        "soldKg": { "type": "number" },
+        "wasteKg": { "type": "number" },
+        "unsoldKg": { "type": "number" },
+        "procurementCostPerKg": { "type": "number" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "commodity", "date", "arrivedKg", "soldKg", "wasteKg", "unsoldKg"]
+    },
+    "KhataCustomerItem": {
+      "title": "KhataCustomerItem",
+      "description": "Customer credit debt ledger account and transactions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "trustTier": { "type": "string", "enum": ["gold", "silver", "caution"] },
+        "creditLimit": { "type": "number" },
+        "currentBalance": { "type": "number" },
+        "lastTransactionDate": { "type": "string" },
+        "notes": { "type": "string" },
+        "transactions": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      },
+      "required": ["id", "name", "phone", "trustTier", "creditLimit", "currentBalance"]
+    },
+    "ResQLot": {
+      "title": "ResQLot",
+      "description": "Surplus produce rescue lot for real-time clearance and negotiation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "commodity": { "type": "string" },
+        "vendorName": { "type": "string" },
+        "vendorStall": { "type": "string" },
+        "vendorPhone": { "type": "string" },
+        "vendorVpa": { "type": "string" },
+        "totalKg": { "type": "number" },
+        "unsoldKg": { "type": "number" },
+        "normalPricePerKg": { "type": "number" },
+        "suggestedMarkdownPrice": { "type": "number" },
+        "discountPercent": { "type": "number" },
+        "status": { "type": "string", "enum": ["available", "reserved", "sold", "expired"] },
+        "reservedBy": { "type": "string" },
+        "reservedKg": { "type": "number" },
+        "agreedPricePerKg": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["pending", "settled"] },
+        "createdAt": { "type": "string" },
+        "marketClosesAt": { "type": "string" }
+      },
+      "required": ["id", "commodity", "vendorName", "unsoldKg", "suggestedMarkdownPrice", "status"]
+    },
+    "ResQMessage": {
+      "title": "ResQMessage",
+      "description": "Real-time negotiation and chat messages between vendors and buyers",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "lotId": { "type": "string" },
+        "senderRole": { "type": "string", "enum": ["vendor", "buyer"] },
+        "senderName": { "type": "string" },
+        "senderId": { "type": "string" },
+        "type": { "type": "string", "enum": ["chat", "counter_offer", "accept_offer", "reserve", "payment_proof", "system"] },
+        "text": { "type": "string" },
+        "proposedPricePerKg": { "type": "number" },
+        "proposedKg": { "type": "number" },
+        "settlementAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["id", "lotId", "senderRole", "senderName", "type", "text", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Vendor profile and user root document"
+    },
+    "/users/{userId}/stock_logs/{logId}": {
+      "schema": "StockLogItem",
+      "description": "Daily stock logs for the authenticated vendor"
+    },
+    "/users/{userId}/khata_customers/{customerId}": {
+      "schema": "KhataCustomerItem",
+      "description": "Khata ledger customer debt accounts for the vendor"
+    },
+    "/resq_lots/{lotId}": {
+      "schema": "ResQLot",
+      "description": "Collection of surplus rescue produce lots"
+    },
+    "/resq_lots/{lotId}/messages/{messageId}": {
+      "schema": "ResQMessage",
+      "description": "Real-time subcollection of chat and negotiation events for a specific lot"
+    }
+  }
+}
