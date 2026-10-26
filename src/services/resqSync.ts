@@ -73,9 +73,29 @@ const bc = typeof window !== 'undefined' && 'BroadcastChannel' in window
 const STORAGE_KEY_LOTS = 'santhai_resq_lots_cache';
 const STORAGE_KEY_MSGS = 'santhai_resq_msgs_cache';
 
+/**
+ * ResQSyncService: Real-Time B2B Produce Surplus Clearinghouse & Messaging Bus
+ *
+ * Architecture & Protocols:
+ * 1. Hybrid Real-Time Persistence:
+ *    - Cloud Firestore `onSnapshot` subscriptions provide sub-second multi-device sync
+ *      between produce vendors and institutional canteen/mess buyers.
+ *    - LocalStorage dual-write cache (`santhai_resq_lots_cache`, `santhai_resq_msgs_cache`)
+ *      provides instant 0ms offline rendering.
+ *    - Inter-tab `BroadcastChannel('santhai_resq_realtime')` propagates state changes across
+ *      multiple open browser tabs instantly without network roundtrips.
+ *
+ * 2. Multi-Role Authorization (RBAC):
+ *    - 'vendor': Can create markdown lots, adjust clearance discounts, accept/counter bids.
+ *    - 'buyer': Can browse active surplus listings, place reservations, and send live chat inquiries.
+ *
+ * 3. Haptic & Acoustic Signaling:
+ *    Fires distinctive audio chimes (`SoundEffects.playSuccess()`) and dual vibration pulses
+ *    when a surplus lot is claimed or negotiated.
+ */
 export class ResQSyncService {
   /**
-   * Reads cached lots from localStorage
+   * Reads cached clearance lots from localStorage.
    */
   public static getCachedLots(): ResQLotItem[] {
     try {

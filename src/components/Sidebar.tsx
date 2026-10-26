@@ -11,7 +11,8 @@ import {
   Sparkles,
   ShieldCheck,
   Sun,
-  HardDrive
+  HardDrive,
+  Scale
 } from 'lucide-react';
 import { Language, VendorProfile, BgTheme, ActiveTab } from '../types';
 import { SoundEffects } from '../utils/audioHaptics';
@@ -23,6 +24,7 @@ interface SidebarProps {
   vendorProfile: VendorProfile;
   surplusAlertCount: number;
   onOpenAuth: () => void;
+  onOpenFeasibility?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -31,7 +33,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   lang,
   vendorProfile,
   surplusAlertCount,
-  onOpenAuth
+  onOpenAuth,
+  onOpenFeasibility
 }) => {
   const navItems: {
     id: ActiveTab;
@@ -179,6 +182,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="space-y-4 pt-4 border-t border-[#e3ece2]">
+        {/* Market Data & Feasibility Intelligence Button */}
+        {onOpenFeasibility && (
+          <button
+            onClick={() => {
+              SoundEffects.playClick();
+              onOpenFeasibility();
+            }}
+            className="w-full flex items-center justify-between p-2.5 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border border-emerald-500/25 text-left transition-all group shadow-2xs cursor-pointer"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <Scale className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-black text-emerald-950 truncate">
+                  {lang === 'ta' ? 'அரசு & கள ஆய்வு மையம்' : 'Govt & Field Intel'}
+                </div>
+                <div className="text-[10px] text-emerald-700 font-medium truncate">
+                  {lang === 'ta' ? 'கள கணக்கெடுப்பு & விலை இடைவெளி' : 'Counted surveys & spread'}
+                </div>
+              </div>
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-wider bg-emerald-600 text-white px-1.5 py-0.5 rounded-md">
+              Real
+            </span>
+          </button>
+        )}
+
         {/* WhatsApp-First Info Card as in reference screenshot */}
         <div className="bg-[#eaf4ec] border border-[#d6ebd9] rounded-2xl p-4 text-left relative overflow-hidden shadow-2xs">
           <div className="flex items-center gap-2 text-emerald-800 mb-1.5">

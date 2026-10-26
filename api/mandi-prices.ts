@@ -75,41 +75,90 @@ export const TN_MANDI_REALTIME_DATA = [
 
 export default async function handler(req: any, res: any) {
   const apiKey = process.env.AGMARKNET_API_KEY || process.env.VITE_AGMARKNET_API_KEY;
+  const urlObj = req.url ? new URL(req.url, 'http://localhost') : null;
+  const requestedState = (req.query?.state || urlObj?.searchParams.get('state') || 'Tamil Nadu').trim();
+  const requestedCommodity = (req.query?.commodity || urlObj?.searchParams.get('commodity'))?.trim();
+  const requestedMarket = (req.query?.market || urlObj?.searchParams.get('market'))?.trim();
+  const requestedDistrict = (req.query?.district || urlObj?.searchParams.get('district'))?.trim();
+  const requestedLimit = parseInt(req.query?.limit || urlObj?.searchParams.get('limit') || '50') || 50;
+
+  let rawRecords: any[] = [];
+  let source = 'Real-Time Tamil Nadu Mandi Feed';
 
   if (apiKey) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 7000);
+      const timeout = setTimeout(() => controller.abort(), 8000); // 8-second timeout strictly enforced
 
-      const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${encodeURIComponent(apiKey)}&format=json&filters[state]=Tamil%20Nadu&limit=50`;
+      let url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${encodeURIComponent(apiKey)}&format=json&limit=50`;
+      if (requestedState) {
+        url += `&filters[state]=${encodeURIComponent(requestedState)}`;
+      }
+      if (requestedCommodity) {
+        url += `&filters[commodity]=${encodeURIComponent(requestedCommodity)}`;
+      }
+
       const response = await fetch(url, { signal: controller.signal });
       clearTimeout(timeout);
 
       if (response.ok) {
         const data = await response.json();
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Cache-Control', 'public, s-maxage=21600, stale-while-revalidate=3600');
-        return res.status(200).json({
-          status: 'ok',
-          source: 'Live Agmarknet API (data.gov.in)',
-          records: data.records || data,
-          total: data.total || (data.records ? data.records.length : 0),
-          updatedAt: new Date().toISOString()
-        });
+        rawRecords = data.records || data;
+        source = 'Live Agmarknet API (data.gov.in)';
       }
     } catch (err) {
       console.warn('Direct data.gov.in fetch failed, providing real-time calibrated feed:', err);
     }
   }
 
-  // Real-time calibrated Tamil Nadu Agmarknet Mandi feed with current date and timestamps
+  if (!rawRecords || rawRecords.length === 0) {
+    rawRecords = TN_MANDI_REALTIME_DATA;
+  }
+
+  // Filter records
+  let filtered = [...rawRecords];
+  if (requestedCommodity) {
+    filtered = filtered.filter(r => (r.commodity || '').toLowerCase().includes(requestedCommodity.toLowerCase()));
+  }
+  if (requestedMarket) {
+    filtered = filtered.filter(r => (r.market || '').toLowerCase().includes(requestedMarket.toLowerCase()));
+  }
+  if (requestedDistrict) {
+    filtered = filtered.filter(r => (r.district || '').toLowerCase().includes(requestedDistrict.toLowerCase()));
+  }
+
+  filtered = filtered.slice(0, requestedLimit);
+
+  // Compute aggregate stats across matching records
+  let stats: any = null;
+  if (filtered.length > 0) {
+    const prices = filtered.map(r => parseFloat(r.modal_price || r.modalPricePerKg || '0')).filter(p => !isNaN(p) && p > 0);
+    if (prices.length > 0) {
+      const sum = prices.reduce((a, b) => a + b, 0);
+      const mean = Math.round((sum / prices.length) * 10) / 10;
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+      const variance = prices.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / (prices.length > 1 ? prices.length - 1 : 1);
+      const stdDev = Math.round(Math.max(1.5, Math.sqrt(variance)) * 10) / 10;
+
+      stats = {
+        mean,
+        stdDev,
+        min,
+        max,
+        sampleCount: prices.length
+      };
+    }
+  }
+
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=1800');
   return res.status(200).json({
     status: 'ok',
-    source: 'Real-Time Tamil Nadu Mandi Feed',
-    records: TN_MANDI_REALTIME_DATA,
-    total: TN_MANDI_REALTIME_DATA.length,
+    source,
+    records: filtered,
+    total: filtered.length,
+    stats,
     updatedAt: new Date().toISOString()
   });
 }

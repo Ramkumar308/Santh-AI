@@ -24,6 +24,7 @@ import {
 } from './data/commodities';
 import { AgmarknetService } from './services/agmarknet';
 import { AuthService } from './services/auth';
+import { SupabaseService } from './services/supabase';
 import { FirebaseService, auth } from './services/firebase';
 import { User } from 'firebase/auth';
 import { ResQService } from './services/resq';
@@ -36,6 +37,7 @@ import { ResQModule } from './components/ResQModule';
 import { KhataModule } from './components/KhataModule';
 import { VendorAuthModal } from './components/VendorAuthModal';
 import { DataVaultModal } from './components/DataVaultModal';
+import { MarketDataFeasibilityCenter } from './components/MarketDataFeasibilityCenter';
 import { MarketPulseTicker } from './components/MarketPulseTicker';
 import { MarketSessionBanner, MarketSession } from './components/MarketSessionBanner';
 import { ThemePaletteBar } from './components/ThemePaletteBar';
@@ -94,6 +96,7 @@ export default function App() {
   // Vendor state
   const [vendorProfile, setVendorProfile] = useState<VendorProfile>(AuthService.getCurrentProfile());
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isFeasibilityOpen, setIsFeasibilityOpen] = useState<boolean>(false);
 
   // Multi-user ResQ Role state: 'vendor' vs 'buyer' (Mess / Hostel)
   const [resqUserRole, setResqUserRole] = useState<ResQUserRole>('vendor');
@@ -330,17 +333,20 @@ export default function App() {
     setVendorPrices(prices as Record<CommodityType, number>);
   };
 
-  // Save changes to localStorage and Cloud Firestore
+  // Save changes to localStorage, Cloud Firestore, and Supabase Postgres
   useEffect(() => {
     try {
       localStorage.setItem('santhai_stock_logs', JSON.stringify(stockLogs));
       if (auth.currentUser) {
         FirebaseService.syncStockLogs(auth.currentUser.uid, stockLogs);
       }
+      if (SupabaseService.isConfigured() && vendorProfile.id) {
+        SupabaseService.saveStockLogs(vendorProfile.id, stockLogs);
+      }
     } catch (e) {
       console.warn(e);
     }
-  }, [stockLogs]);
+  }, [stockLogs, vendorProfile.id]);
 
   useEffect(() => {
     try {
@@ -356,10 +362,13 @@ export default function App() {
       if (auth.currentUser) {
         FirebaseService.syncKhataCustomers(auth.currentUser.uid, khataCustomers);
       }
+      if (SupabaseService.isConfigured() && vendorProfile.id) {
+        SupabaseService.saveKhataCustomers(vendorProfile.id, khataCustomers);
+      }
     } catch (e) {
       console.warn(e);
     }
-  }, [khataCustomers]);
+  }, [khataCustomers, vendorProfile.id]);
 
   useEffect(() => {
     try {
@@ -585,6 +594,7 @@ export default function App() {
           vendorProfile={vendorProfile}
           surplusAlertCount={surplusAlerts.length}
           onOpenAuth={() => setIsAuthModalOpen(true)}
+          onOpenFeasibility={() => setIsFeasibilityOpen(true)}
         />
       </div>
 
@@ -603,6 +613,10 @@ export default function App() {
               surplusAlertCount={surplusAlerts.length}
               onOpenAuth={() => {
                 setIsAuthModalOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+              onOpenFeasibility={() => {
+                setIsFeasibilityOpen(true);
                 setIsMobileMenuOpen(false);
               }}
             />
@@ -625,6 +639,7 @@ export default function App() {
             isOutdoorMode={isOutdoorMode}
             onToggleOutdoorMode={handleToggleOutdoorMode}
             onOpenDataVault={() => setIsDataVaultOpen(true)}
+            onOpenFeasibility={() => setIsFeasibilityOpen(true)}
             onRefreshPrices={() => fetchMandiRates(true)}
             isRefreshing={isRefreshingPrices}
             bgTheme={bgTheme}
@@ -1008,6 +1023,13 @@ export default function App() {
         logs={stockLogs}
         vendorPrices={vendorPrices}
         onRestore={handleRestoreBackup}
+        lang={lang}
+      />
+
+      {/* Market Data Sources & Feasibility Intelligence Center Modal */}
+      <MarketDataFeasibilityCenter
+        isOpen={isFeasibilityOpen}
+        onClose={() => setIsFeasibilityOpen(false)}
         lang={lang}
       />
     </div>

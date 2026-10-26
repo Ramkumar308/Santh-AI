@@ -538,15 +538,18 @@ export const ResQModule: React.FC<ResQModuleProps> = ({
       {/* MODE (B): BULK ORDERS BOARD */}
       {activeSubMode === 'bulk' && (
         <div className="space-y-4">
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-emerald-600" />
+              <Building2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <p className="text-xs text-slate-700 font-medium">
                 {lang === 'ta'
                   ? 'இந்த ஆர்டர்களை நீங்கள் எடுக்கும் போது, அவை தானாகவே உங்கள் "சரக்கு (Stock)" தேவை கணிப்பில் சேர்க்கப்படும்!'
                   : 'When you claim recurring bulk orders, their daily quantity is automatically factored into your Stock forecast as pre-committed demand.'}
               </p>
             </div>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-800 border border-indigo-200 shrink-0">
+              {lang === 'ta' ? 'மாதிரி பார்ட்னர் பட்டியல்கள் (Simulated Partner Listings)' : 'Simulated Partner Listings'}
+            </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

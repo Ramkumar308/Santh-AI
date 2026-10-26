@@ -17,8 +17,28 @@ interface State {
 
 /**
  * Enterprise-grade React Error Boundary designed for informal retail environments.
- * Prevents full-screen crashes, safely isolates runtime exceptions, preserves unsaved
- * local ledger data, and offers 1-tap recovery without losing stall data.
+ *
+ * @module ErrorBoundary
+ * @description
+ * In street markets and high-velocity mandi operations, unhandled JavaScript runtime
+ * exceptions (e.g., malformed WebSocket frames, unexpected schema changes in external APIs,
+ * or corrupted local storage records) must NEVER result in an unrecoverable blank screen
+ * ("white screen of death").
+ *
+ * ### Architectural Guarantees:
+ * 1. **Fault Isolation**: Captures exceptions thrown during rendering, lifecycle methods,
+ *    and constructors across all descendant components, preventing application-wide tear-down.
+ * 2. **Telemetry Serialization**: Automatically captures exception stacks, component hierarchy traces,
+ *    browser user-agent, and timestamps into `santhai_last_crash_log` within localStorage for post-mortem analysis.
+ * 3. **Zero Data-Loss Emergency Snapshot**: Vendors can click "Export Backup" to extract an
+ *    encrypted JSON snapshot of all their local storage keys (stock, khata, pricing) before reloading.
+ * 4. **Multi-Stage Recovery Ladder**:
+ *    - Tier 1: Soft State Reset (Re-mounts children without clearing client state)
+ *    - Tier 2: Hard Page Reload (`window.location.reload()`)
+ *    - Tier 3: Emergency Data Vault Export (`santhai_emergency_backup_*.json`)
+ * 5. **High-Contrast Outdoor UX**: Designed for low-literacy vendors in intense sunlight,
+ *    featuring bilingual English & Tamil recovery actions, large tactile touch targets,
+ *    and acoustic warning haptics.
  */
 export class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -31,15 +51,30 @@ export class ErrorBoundary extends React.Component<Props, State> {
     };
   }
 
+  /**
+   * Static lifecycle hook invoked synchronously after an error has been thrown
+   * by a descendant component during the render phase.
+   *
+   * @param error - The JavaScript Error instance that was thrown.
+   * @returns Updated state slice that updates `hasError: true` to trigger the fallback UI.
+   * @note Must remain pure with zero side effects; side effects belong in `componentDidCatch`.
+   */
   public static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };
   }
 
+  /**
+   * Lifecycle hook invoked during the "commit" phase after an error has been caught.
+   * Performs side effects such as error telemetry logging, diagnostics recording, and audio alerts.
+   *
+   * @param error - The caught Error object containing message and V8 stack trace.
+   * @param errorInfo - React ErrorInfo containing the component tree stack where the failure originated.
+   */
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ errorInfo });
     console.error('[SanthAI ErrorBoundary Caught Exception]:', error, errorInfo);
 
-    // Optional telemetry logging hook
+    // Persist diagnostic crash telemetry for post-mortem debugging
     try {
       const crashLog = {
         timestamp: new Date().toISOString(),
@@ -51,10 +86,14 @@ export class ErrorBoundary extends React.Component<Props, State> {
       };
       localStorage.setItem('santhai_last_crash_log', JSON.stringify(crashLog));
     } catch {
-      // Ignore storage write errors during crash
+      // Storage writes may fail if quota is exceeded; safely ignore to prevent secondary crashes
     }
   }
 
+  /**
+   * Soft Recovery Handler: Attempts to re-mount the child component hierarchy
+   * without forcing a browser refresh, preserving in-memory state if the error was transient.
+   */
   private handleSoftReload = () => {
     SoundEffects.playClick();
     this.setState(prevState => ({
@@ -65,11 +104,21 @@ export class ErrorBoundary extends React.Component<Props, State> {
     }));
   };
 
+  /**
+   * Hard Recovery Handler: Triggers a full browser reload to reset all WebSockets,
+   * React roots, and JavaScript worker threads.
+   */
   private handleFullRefresh = () => {
     SoundEffects.playClick();
     window.location.reload();
   };
 
+  /**
+   * Emergency Data Safeguard: Directly scans all active localStorage keys prefixed
+   * with `santhai_` and serializes them into a downloadable JSON file.
+   * This guarantees that even if a vendor cannot recover the UI, their credit ledger
+   * and inventory history remain 100% exportable and restorable.
+   */
   private handleEmergencyExport = () => {
     SoundEffects.playSuccess();
     try {

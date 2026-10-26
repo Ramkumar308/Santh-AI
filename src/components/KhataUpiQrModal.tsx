@@ -33,15 +33,24 @@ export const KhataUpiQrModal: React.FC<KhataUpiQrModalProps> = ({
   onClose,
   onSettlePayment
 }) => {
-  const initialDue = customer.totalDue > 0 ? customer.totalDue : 500;
+  const initialDue = customer.totalDue > 0 ? customer.totalDue : 0;
   const [amount, setAmount] = useState<number>(initialDue);
   const [preset, setPreset] = useState<'full' | 'half' | 'custom'>('full');
-  const [customInput, setCustomInput] = useState<string>(initialDue.toString());
+  const [customInput, setCustomInput] = useState<string>(initialDue > 0 ? initialDue.toString() : '500');
   const [qrSvg, setQrSvg] = useState<string>('');
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [copiedVpa, setCopiedVpa] = useState<boolean>(false);
   const [isSettled, setIsSettled] = useState<boolean>(false);
+
+  // Synchronize state if customer changes
+  useEffect(() => {
+    const due = customer.totalDue > 0 ? customer.totalDue : 0;
+    setAmount(due > 0 ? due : 500);
+    setCustomInput(due > 0 ? due.toString() : '500');
+    setPreset('full');
+    setIsSettled(false);
+  }, [customer.id, customer.totalDue]);
 
   // Fallback demo VPA if merchant hasn't configured a custom VPA yet
   const merchantVpa = vendorProfile.upiId && vendorProfile.upiId.trim().length > 3

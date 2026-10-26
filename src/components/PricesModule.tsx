@@ -39,6 +39,8 @@ import { SoundEffects } from '../utils/audioHaptics';
 import confetti from 'canvas-confetti';
 import { DailyProfitCalculator } from './DailyProfitCalculator';
 import { MandiSearchGrounding } from './MandiSearchGrounding';
+import { MarketDataFeasibilityCenter } from './MarketDataFeasibilityCenter';
+import { WHOLESALE_TO_RETAIL_GAP_FINDINGS } from '../data/marketIntelligence';
 import {
   BarChart,
   Bar,
@@ -79,6 +81,7 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
   const [showMandiTable, setShowMandiTable] = useState<boolean>(false);
   const [showSearchGrounding, setShowSearchGrounding] = useState<boolean>(false);
   const [showRetailCalculator, setShowRetailCalculator] = useState<boolean>(true);
+  const [isFeasibilityModalOpen, setIsFeasibilityModalOpen] = useState<boolean>(false);
   const [freightPerKg, setFreightPerKg] = useState<number>(2.0);
   const [shrinkagePct, setShrinkagePct] = useState<number>(8.0);
   const [desiredMarginPct, setDesiredMarginPct] = useState<number>(20.0);
@@ -162,6 +165,10 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
               <span>{lang === 'ta' ? 'புதுப்பிக்கப்பட்டது:' : 'Updated:'} {priceStatus.lastUpdated}</span>
             </span>
 
+            <span className="px-2 py-0.5 rounded-md bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 text-[10px] font-semibold">
+              {lang === 'ta' ? 'உண்மை மண்டி விலை தகவல் (Agmarknet data.gov.in)' : 'Agmarknet Mandi Prices (data.gov.in)'}
+            </span>
+
             {priceStatus.apiLatencyMs && (
               <span className="text-emerald-400 text-[11px] font-mono bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/60">
                 ⚡ {priceStatus.apiLatencyMs}ms
@@ -170,6 +177,17 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
           </div>
 
           <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap">
+            <button
+              onClick={() => {
+                SoundEffects.playClick();
+                setIsFeasibilityModalOpen(true);
+              }}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-400/40 hover:bg-emerald-500/30 transition-all cursor-pointer shadow-2xs"
+              title="Government Sources, 6-Vendor Field Surveys & Wholesale-to-Retail Gap Analysis"
+            >
+              <Scale className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{lang === 'ta' ? 'அரசு & கள ஆய்வு மையம்' : 'Govt & Field Intel'}</span>
+            </button>
             <button
               onClick={() => {
                 SoundEffects.playClick();
@@ -422,6 +440,81 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
             ))}
           </div>
         )}
+      </div>
+
+      {/* 4-TIER MULTI-SOURCE PRICE GROUNDING & FIELD DATA BENCHMARK (Government + Farmer + Field Counts) */}
+      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-700/80">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-700/80">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                FIELD GROUNDED INTELLIGENCE
+              </span>
+              <span className="text-xs text-slate-400">
+                {lang === 'ta' ? 'அரசு மண்டி + உழவர் சந்தை + நேரடி களக் கணக்கெடுப்பு' : 'Govt Mandi + Uzhavar Sandhai + 6-Vendor Field Surveys'}
+              </span>
+            </div>
+            <h3 className="text-base sm:text-lg font-black text-white">
+              {lang === 'ta'
+                ? 'மொத்த விலை vs உழவர் விலை vs கடை சில்லறை விலை ஒப்பீடு'
+                : 'Wholesale vs Farmer Direct vs Street Retail Price Spread'}
+            </h3>
+            <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+              {lang === 'ta'
+                ? 'அரசு மண்டி மொத்த விலை (Agmarknet) அடிப்படை தளத்தை அளிக்கிறது. கோயம்புத்தூர் உழவர் சந்தை & 6 வியாபாரிகளிடம் நேரடியாக சேகரிக்கப்பட்ட களத் தரவு உண்மையான சில்லறை விலையை காட்டுகிறது.'
+                : 'Agmarknet gives the wholesale auction baseline, while Uzhavar Sandhai farmer bulletins and our 6-vendor field counts capture the actual street retail reality. Sourced together for defensible pricing.'}
+            </p>
+          </div>
+
+          <button
+            onClick={() => {
+              SoundEffects.playClick();
+              setIsFeasibilityModalOpen(true);
+            }}
+            className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black flex items-center gap-1.5 transition-all shadow-xs shrink-0 cursor-pointer"
+          >
+            <Scale className="w-4 h-4" />
+            <span>{lang === 'ta' ? 'முழு களத் தரவு & இடைவெளி ஆய்வு' : 'View Full Field Surveys & Gap Analysis'}</span>
+          </button>
+        </div>
+
+        {/* 5-Commodity Quick Spread Ribbon */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-4">
+          {WHOLESALE_TO_RETAIL_GAP_FINDINGS.map(finding => (
+            <div
+              key={finding.commodity}
+              className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-3 transition-colors flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between text-xs font-bold text-slate-200 mb-1">
+                  <span>{finding.commodity}</span>
+                  <span className="text-[10px] text-emerald-400 font-mono font-normal">
+                    +{finding.gapPercentage}%
+                  </span>
+                </div>
+
+                <div className="space-y-1 font-mono text-[11px]">
+                  <div className="flex justify-between text-slate-400">
+                    <span>Mandi:</span>
+                    <span>₹{finding.agmarknetMandiWholesaleModal}</span>
+                  </div>
+                  <div className="flex justify-between text-amber-300">
+                    <span>Uzhavar:</span>
+                    <span>₹{finding.uzhavarSandhaiFarmerDirect}</span>
+                  </div>
+                  <div className="flex justify-between text-white font-bold">
+                    <span>Field:</span>
+                    <span className="text-emerald-400">₹{finding.fieldSurveyStallRetailAvg}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-2 pt-1.5 border-t border-white/10 text-[10px] text-slate-400 truncate">
+                Spread: <b className="text-white">+₹{finding.gapRsPerKg}/kg</b>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Wholesale-to-Retail Margin & Shrinkage Breakdown Bridge (Addresses Mandi-Retail Gap) */}
@@ -900,6 +993,13 @@ export const PricesModule: React.FC<PricesModuleProps> = ({
           </div>
         </div>
       )}
+
+      {/* Market Data Sources & Feasibility Intelligence Modal */}
+      <MarketDataFeasibilityCenter
+        isOpen={isFeasibilityModalOpen}
+        onClose={() => setIsFeasibilityModalOpen(false)}
+        lang={lang}
+      />
     </div>
   );
 };

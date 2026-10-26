@@ -55,7 +55,10 @@ export const VoiceStockRecorderModal: React.FC<VoiceStockRecorderModalProps> = (
   const [unsoldKg, setUnsoldKg] = useState<number>(4);
   const [selectedCommodity, setSelectedCommodity] = useState<CommodityType>(currentCommodity);
 
+  const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
   const recognitionRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     if (isOpen) {
@@ -72,10 +75,83 @@ export const VoiceStockRecorderModal: React.FC<VoiceStockRecorderModalProps> = (
   const checkSpeechSupport = () => {
     const win = window as unknown as IWindow;
     const SpeechRec = win.SpeechRecognition || win.webkitSpeechRecognition;
-    if (!SpeechRec) {
-      setSpeechSupported(false);
-    } else {
-      setSpeechSupported(true);
+    setSpeechSupported(Boolean(SpeechRec));
+  };
+
+  const startAiRecording = async () => {
+    try {
+      setErrorMsg(null);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+      const mr = new MediaRecorder(stream);
+      mediaRecorderRef.current = mr;
+
+      mr.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      mr.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = async () => {
+          const b64 = reader.result as string;
+          await sendAudioToApi(b64);
+        };
+      };
+
+      mr.start();
+      setIsListening(true);
+      setTranscript(lang === 'ta' ? '🎤 பேசுகிறீர்கள் (AI பதிவு)...' : '🎤 Listening (Gemini Audio)...');
+      SoundEffects.playClick();
+    } catch {
+      setIsListening(false);
+      setErrorMsg(
+        lang === 'ta'
+          ? 'மைக்ரோஃபோன் அனுமதி தேவை. உலாவியில் மைக் அனுமதியை வழங்கி மீண்டும் முயற்சிக்கவும்.'
+          : 'Microphone permission is required to record audio.'
+      );
+    }
+  };
+
+  const sendAudioToApi = async (b64: string) => {
+    setIsAiLoading(true);
+    try {
+      const resp = await fetch('/api/voice/parse-stock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          audioBase64: b64,
+          commodity: selectedCommodity,
+          mimeType: 'audio/webm'
+        })
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+
+      if (data.transcript) {
+        setTranscript(data.transcript);
+      }
+      if (data.parsed) {
+        setParsedData(data.parsed);
+        if (data.parsed.detectedCommodity) {
+          setSelectedCommodity(data.parsed.detectedCommodity);
+          onSelectCommodity?.(data.parsed.detectedCommodity);
+        }
+        if (data.parsed.receivedKg !== undefined) setReceivedKg(data.parsed.receivedKg);
+        if (data.parsed.wasteKg !== undefined) setWasteKg(data.parsed.wasteKg);
+        if (data.parsed.soldKg !== undefined) setSoldKg(data.parsed.soldKg);
+        if (data.parsed.unsoldKg !== undefined) setUnsoldKg(data.parsed.unsoldKg);
+
+        SoundEffects.playSuccess();
+        const readback = lang === 'ta' ? data.parsed.summaryTa : data.parsed.summaryEn;
+        speakText(readback, lang);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Failed to process voice input');
+    } finally {
+      setIsAiLoading(false);
     }
   };
 
@@ -86,13 +162,9 @@ export const VoiceStockRecorderModal: React.FC<VoiceStockRecorderModalProps> = (
     const win = window as unknown as IWindow;
     const SpeechRec = win.SpeechRecognition || win.webkitSpeechRecognition;
 
+    // If native speech recognition isn't available, automatically fallback to MediaRecorder + Gemini
     if (!SpeechRec) {
-      setSpeechSupported(false);
-      setErrorMsg(
-        lang === 'ta'
-          ? 'உங்கள் உலாவியில் குரல் அறிதல் ஆதரிக்கப்படவில்லை. கீழே உள்ள மாதிரி உதாரணங்களை பயன்படுத்தலாம்.'
-          : 'Speech recognition is not natively supported in this browser. You can use the quick sample voice buttons below.'
-      );
+      startAiRecording();
       return;
     }
 
@@ -133,27 +205,10 @@ export const VoiceStockRecorderModal: React.FC<VoiceStockRecorderModalProps> = (
       };
 
       recognition.onerror = (event: any) => {
-        console.warn('Speech recognition error:', event.error);
+        console.warn('Speech recognition error, falling back to Gemini audio recorder:', event.error);
         setIsListening(false);
-        if (event.error === 'not-allowed') {
-          setErrorMsg(
-            lang === 'ta'
-              ? 'மைக்ரோஃபோன் அனுமதி மறுக்கப்பட்டுள்ளது. உலாவியில் மைக் அனுமதியை இயக்கி மீண்டும் முயற்சிக்கவும்.'
-              : 'Microphone access was denied. Please allow microphone permissions in browser settings.'
-          );
-        } else if (event.error === 'no-speech') {
-          setErrorMsg(
-            lang === 'ta'
-              ? 'குரல் கேட்கவில்லை. மைக் அருகே மீண்டும் தெளிவாக பேசவும்.'
-              : 'No speech detected. Please speak closer to the microphone.'
-          );
-        } else {
-          setErrorMsg(
-            lang === 'ta'
-              ? 'குரல் பதிவில் பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.'
-              : `Speech recognition error: ${event.error}`
-          );
-        }
+        // Fallback to Gemini AI audio recording on recognition failure
+        startAiRecording();
       };
 
       recognition.onend = () => {
@@ -163,20 +218,23 @@ export const VoiceStockRecorderModal: React.FC<VoiceStockRecorderModalProps> = (
       recognitionRef.current = recognition;
       recognition.start();
     } catch (err: any) {
-      setIsListening(false);
-      setErrorMsg(err?.message || 'Could not start microphone');
+      // Fallback to Gemini AI recording
+      startAiRecording();
     }
   };
 
   const stopListening = () => {
+    if (mediaRecorderRef.current && isListening) {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch {}
+    }
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
-      } catch {
-        // Ignore stop errors
-      }
-      setIsListening(false);
+      } catch {}
     }
+    setIsListening(false);
   };
 
   const processSpokenTranscript = (spokenText: string) => {
@@ -308,7 +366,14 @@ export const VoiceStockRecorderModal: React.FC<VoiceStockRecorderModalProps> = (
 
           <div className="space-y-1">
             <p className="font-bold text-slate-800 text-sm flex items-center justify-center gap-1.5">
-              {isListening ? (
+              {isAiLoading ? (
+                <>
+                  <Radio className="w-4 h-4 text-teal-600 animate-spin" />
+                  <span className="text-teal-700 font-bold">
+                    {lang === 'ta' ? 'Gemini AI குரலை உணர்ந்து பிரிக்கிறது...' : 'Gemini AI transcribing & parsing speech...'}
+                  </span>
+                </>
+              ) : isListening ? (
                 <>
                   <Radio className="w-4 h-4 text-rose-600 animate-pulse" />
                   <span className="text-rose-600 font-black">

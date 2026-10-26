@@ -102,4 +102,28 @@ export class KhataService {
     const encoded = encodeURIComponent(message);
     return `https://wa.me/${cleanPhone}?text=${encoded}`;
   }
+
+  /**
+   * Generates a standard NPCI UPI payment URI based on a customer's totalDue balance.
+   * Format: upi://pay?pa=...&pn=...&am=...&cu=INR&tn=...
+   *
+   * @param customer Customer record with totalDue balance
+   * @param vendor Vendor profile containing merchant UPI VPA & business name
+   * @param amount Optional custom settlement amount (defaults to customer.totalDue)
+   * @returns Standard upi://pay URI compatible with all Indian UPI apps (GPay, PhonePe, Paytm, BHIM)
+   */
+  public static generateUpiUrl(
+    customer: KhataCustomer,
+    vendor: VendorProfile,
+    amount?: number
+  ): string {
+    const rawVpa = vendor.upiId && vendor.upiId.trim().length > 3
+      ? vendor.upiId.trim()
+      : 'santhai.traders@okaxis';
+    const merchantName = vendor.name || 'SanthAI Wholesaler';
+    const finalAmount = amount !== undefined ? amount : (customer.totalDue > 0 ? customer.totalDue : 0);
+    const note = `Khata Due - ${customer.name}`;
+
+    return `upi://pay?pa=${encodeURIComponent(rawVpa)}&pn=${encodeURIComponent(merchantName)}&am=${finalAmount.toFixed(2)}&cu=INR&tn=${encodeURIComponent(note)}`;
+  }
 }

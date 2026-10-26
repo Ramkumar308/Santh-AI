@@ -1,10 +1,36 @@
 import { CommodityType, DailyStockLog, SurplusRescueMatch, BulkOrderBoardItem, VendorProfile, Language } from '../types';
 import { COMMODITIES } from '../data/commodities';
 
+/**
+ * ResQService: Zero-Waste Dynamic Markdown Clearance & B2B Institutional Liquidation Engine
+ *
+ * Algorithmic Principles:
+ * 1. Time-Decay Clearance Elasticity:
+ *    Perishable vegetables (e.g. Tomatoes, Brinjal, Greens) experience exponential value decay
+ *    as market closing time approaches. After the market gates close, unsold produce has near-zero
+ *    residual value (or incurs disposal/spoilage transport costs).
+ *
+ * 2. Markdown Formulation:
+ *    \Delta t = \max(0.5, \min(8.0, \tau_{\text{close}} - t_{\text{current}}))
+ *    \text{Time Factor} = \max(0, (4 - \Delta t) \times 5) \in [0\%, 20\%]
+ *    \text{Volume Factor} = \min(15, (\text{unsoldKg} / \text{thresholdKg}) \times 4) \in [4\%, 15\%]
+ *    \text{Discount \%} = \min(45, \max(15, 15 + \text{Time Factor} + \text{Volume Factor}))
+ *    P_{\text{markdown}} = \max(P_{\text{floor}}, \text{round}(P_{\text{normal}} \times (1 - \text{Discount \%} / 100)))
+ *
+ * 3. Urgency Escalation:
+ *    \Delta t \le 2.0\text{ hours} \implies \text{'high' urgency (Emergency Push to nearby Messes)}
+ *    2.0 < \Delta t \le 3.5\text{ hours} \implies \text{'medium' urgency}
+ *    \Delta t > 3.5\text{ hours} \implies \text{'low' urgency (Gradual retail markdown)}
+ */
 export class ResQService {
   /**
-   * Evaluates unsold stock from recent logs and generates clearance recommendations
-   * Threshold default: >= 5kg
+   * Evaluates unsold perishable inventory from vendor logs and generates optimized markdown clearance matches.
+   *
+   * @param latestLogs Array of current daily stock logs containing received, sold, and unsold volumes
+   * @param vendorPrices Current retail stall selling prices mapped by CommodityType
+   * @param vendorProfile Profile of vendor containing marketClosingHour and UPI VPA
+   * @param currentTimeHour Floating point hour of day (e.g. 17.5 = 5:30 PM)
+   * @returns Array of SurplusRescueMatch objects with markdown prices, discount percentages, and buyer contacts
    */
   public static detectSurplusAlerts(
     latestLogs: DailyStockLog[],

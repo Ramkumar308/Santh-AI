@@ -163,10 +163,15 @@ export const StockModule: React.FC<StockModuleProps> = ({
         <div className="lg:col-span-7 bg-white rounded-3xl border border-[#e3ece2] p-6 sm:p-7 shadow-2xs hover-lift card-sheen relative flex flex-col justify-between">
           <div>
             {/* Top row: Pill badge & Confidence Dark Badge */}
-            <div className="flex items-start justify-between gap-4">
-              <span className="px-3.5 py-1 rounded-full bg-[#e8f5ec] text-[#166534] font-bold text-xs">
-                {lang === 'ta' ? 'நாளைக்கான திட்டம்' : "Tomorrow's plan"}
-              </span>
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-3.5 py-1 rounded-full bg-[#e8f5ec] text-[#166534] font-bold text-xs">
+                  {lang === 'ta' ? 'நாளைக்கான திட்டம்' : "Tomorrow's plan"}
+                </span>
+                <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-semibold">
+                  {lang === 'ta' ? 'உண்மை கள விற்பனை தரவு (Field-Collected Data)' : 'Field-Collected Vendor Sales Data'}
+                </span>
+              </div>
 
               {/* High-contrast Confidence Badge matching reference screenshot */}
               <div className="bg-[#183a27] text-white rounded-2xl px-4 sm:px-5 py-2 sm:py-2.5 text-center shrink-0 shadow-xs">

@@ -9,9 +9,30 @@ export interface SanthaiBackupData {
   vendorPrices: Record<string, number>;
 }
 
+/**
+ * DataBackupService: Vendor data sovereignty, disaster recovery, and offline snapshot engine.
+ *
+ * Operational Principles:
+ * 1. Data Sovereignty & Portability:
+ *    Allows informal produce merchants to retain complete, unencrypted ownership of their
+ *    credit books, customer ledgers, daily stock balances, and stall profiles in standard JSON format.
+ *
+ * 2. Schema Validation on Import:
+ *    Enforces structural assertions before writing imported JSON into localStorage or cloud DBs,
+ *    preventing schema pollution or malformed transaction state.
+ *
+ * 3. Zero-Loss Emergency Vault:
+ *    Supplements the React ErrorBoundary Tier-3 recovery ladder by providing an immediate,
+ *    browser-native download trigger that does not depend on React DOM re-rendering.
+ */
 export class DataBackupService {
   /**
-   * Generates and downloads a complete JSON backup of the vendor's stall data
+   * Generates and downloads a complete JSON backup of the vendor's stall data.
+   *
+   * @param vendorProfile Merchant profile with UPI ID, market stall, and closing time
+   * @param khataCustomers Array of customer credit ledger accounts with transaction histories
+   * @param stockLogs Array of daily stock, sales, and spoilage records
+   * @param vendorPrices Active stall retail selling prices per commodity
    */
   public static exportCompleteBackup(
     vendorProfile: VendorProfile,

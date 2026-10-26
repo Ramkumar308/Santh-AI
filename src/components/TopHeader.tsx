@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   Store,
-  Building2
+  Building2,
+  Scale
 } from 'lucide-react';
 import { Language, ViewMode, VendorProfile, BgTheme, ResQUserRole, BuyerProfile } from '../types';
 import { DEFAULT_BUYER_PROFILES } from '../services/resqSync';
@@ -42,6 +43,7 @@ interface TopHeaderProps {
   onChangeActiveBuyer?: (buyer: BuyerProfile) => void;
   isGoogleConnected?: boolean;
   cloudSyncStatus?: 'idle' | 'syncing' | 'synced' | 'error';
+  onOpenFeasibility?: () => void;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
@@ -65,7 +67,8 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   activeBuyer = DEFAULT_BUYER_PROFILES[0],
   onChangeActiveBuyer,
   isGoogleConnected = false,
-  cloudSyncStatus = 'idle'
+  cloudSyncStatus = 'idle',
+  onOpenFeasibility
 }) => {
   const [isThemeOpen, setIsThemeOpen] = useState(false);
 
@@ -303,6 +306,20 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             >
               <HardDrive className="w-3.5 h-3.5" />
             </button>
+
+            {onOpenFeasibility && (
+              <button
+                onClick={() => {
+                  SoundEffects.playClick();
+                  onOpenFeasibility();
+                }}
+                className="p-1.5 rounded-lg text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50 transition-colors cursor-pointer"
+                title={lang === 'ta' ? 'அரசு & கள ஆய்வு மையம்' : 'Govt Sources & Field Survey Intelligence'}
+                aria-label="Govt Sources & Field Survey Intelligence"
+              >
+                <Scale className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
       </div>

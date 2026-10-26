@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { VendorProfile, Language } from '../types';
 import { AuthService } from '../services/auth';
+import { SupabaseService } from '../services/supabase';
 import { FirebaseService, auth } from '../services/firebase';
 import { t } from '../utils/i18n';
 import {
@@ -141,22 +142,28 @@ export const VendorAuthModal: React.FC<VendorAuthModalProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-1 border-t border-emerald-200/60 text-[11px] text-emerald-900">
-              <span className="flex items-center gap-1">
-                <Cloud className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Cloud Firestore: <strong>ai-studio-santhai</strong></span>
-              </span>
-              {onManualCloudSync && (
-                <button
-                  type="button"
-                  onClick={onManualCloudSync}
-                  disabled={isCloudSyncing}
-                  className="flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold hover:underline cursor-pointer"
-                >
-                  <RefreshCw className={`w-3 h-3 ${isCloudSyncing ? 'animate-spin' : ''}`} />
-                  <span>{isCloudSyncing ? 'Syncing...' : 'Sync Now'}</span>
-                </button>
-              )}
+            <div className="pt-1 border-t border-emerald-200/60 text-[11px] text-emerald-900 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-1">
+                  <Cloud className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Cloud Firestore: <strong>ai-studio-santhai</strong></span>
+                </span>
+                {onManualCloudSync && (
+                  <button
+                    type="button"
+                    onClick={onManualCloudSync}
+                    disabled={isCloudSyncing}
+                    className="flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold hover:underline cursor-pointer"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${isCloudSyncing ? 'animate-spin' : ''}`} />
+                    <span>{isCloudSyncing ? 'Syncing...' : 'Sync Now'}</span>
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center justify-between text-[10px] text-slate-500">
+                <span>Supabase (Postgres): <strong>{SupabaseService.isConfigured() ? 'Connected' : 'Offline / Local Ready'}</strong></span>
+                <span className="text-emerald-700 font-bold">Auto-Sync</span>
+              </div>
             </div>
           </div>
         ) : (

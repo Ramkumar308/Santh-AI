@@ -44,8 +44,33 @@ const ENGLISH_NUMBER_MAP: Record<string, number> = {
 };
 
 /**
- * Parses spoken voice input in Tamil, English, or mixed Tanglish
- * into structured daily arrival & waste values for low-literacy produce merchants.
+ * Natural Language Voice Stock & Wastage Parser for Low-Literacy Informal Vendors
+ *
+ * Architecture & Parsing Pipeline:
+ * 1. Spoken Word-Number Translation:
+ *    Normalizes spoken Tamil numerals (e.g. "இருபது" -> 20, "ஐம்பது" -> 50) and English words
+ *    into numeric digits prior to regex entity extraction.
+ *
+ * 2. Phonetic Commodity Matching:
+ *    Matches colloquial Tamil produce aliases:
+ *    - தக்காளி (Tomato)
+ *    - வெங்காயம் / சின்ன வெங்காயம் / பல்லாரி (Onion)
+ *    - உருளைக்கிழங்கு / உருளை (Potato)
+ *    - கத்தரிக்காய் / கத்தரி (Brinjal)
+ *    - முட்டைக்கோஸ் / கோஸ் (Cabbage)
+ *    - கேரட் (Carrot)
+ *
+ * 3. Inventory Balancing Conservation Check:
+ *    \text{Unsold Kg} = \text{Received Kg} - \text{Sold Kg} - \text{Waste Kg}
+ *
+ * 4. Confidence Heuristic:
+ *    - 'high': Both Arrival (வரவு) and Waste (கழிவு) extracted, or complete breakdown
+ *    - 'medium': Arrival or single entity extracted with detected commodity
+ *    - 'low': Commodity ambiguous, relying on fallback
+ *
+ * @param transcript Raw speech-to-text transcript string in Tamil, English, or mixed Tanglish
+ * @param fallbackCommodity Produce item assumed if commodity name is omitted from spoken utterance
+ * @returns ParsedStockVoiceInput with extracted numeric metrics, confidence rating, and bilingual readouts
  */
 export function parseSpokenStockEntry(
   transcript: string,

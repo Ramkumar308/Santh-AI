@@ -11,6 +11,14 @@ import { ResQService } from '../resq';
 import { parseSpokenStockEntry } from '../voiceStockParser';
 import { MandiPriceRecord, DailyStockLog, BulkOrderBoardItem, KhataCustomer, VendorProfile, CommodityType } from '../../types';
 import { CACHED_TN_MANDI_PRICES, INITIAL_STOCK_LOGS } from '../../data/commodities';
+import {
+  GOVERNMENT_PRICE_SOURCES,
+  FIELD_COLLECTED_VENDOR_SURVEYS,
+  VENDOR_NOTEBOOK_14_DAY_SALES,
+  CHALKBOARD_PHOTO_RECORDS,
+  WHOLESALE_TO_RETAIL_GAP_FINDINGS,
+  DATA_FEASIBILITY_PILLARS
+} from '../../data/marketIntelligence';
 
 // Simple lightweight assertion runner
 let passedTests = 0;
@@ -174,6 +182,33 @@ function runKhataServiceTests() {
   const remainingCredit = testCustomer.creditLimit - testCustomer.totalDue;
   assert(remainingCredit === 1800, 'Maintains accurate credit headroom (3000 - 1200 = 1800)');
   assert(testCustomer.totalDue < testCustomer.creditLimit, 'Customer does not breach hard credit limit');
+
+  // Test 3.3: Dynamic UPI URI generation based on totalDue balance
+  const mockVendor: VendorProfile = {
+    id: 'vendor-1',
+    name: 'SanthAI Mandi Traders',
+    phone: '9840123456',
+    marketName: 'Koyambedu, Chennai',
+    stallNumber: 'Shop #12',
+    upiId: 'santhai.traders@okaxis',
+    closingTimeStr: '20:00',
+    marketClosingHour: 20
+  };
+
+  const upiUrl = KhataService.generateUpiUrl(testCustomer, mockVendor);
+  assert(upiUrl.startsWith('upi://pay?'), 'Generates valid NPCI UPI URI scheme (upi://pay)');
+  assert(upiUrl.includes('am=1200.00'), 'Encodes exact customer totalDue balance (am=1200.00)', `Received: ${upiUrl}`);
+  assert(upiUrl.includes('pa=santhai.traders%40okaxis'), 'Encodes vendor merchant UPI VPA');
+  assert(upiUrl.includes('tn=Khata%20Due%20-%20Annamalai%20Tea%20Stall'), 'Encodes customer name into transaction note');
+
+  // Test 3.4: Custom settlement amount override
+  const partialUpiUrl = KhataService.generateUpiUrl(testCustomer, mockVendor, 600);
+  assert(partialUpiUrl.includes('am=600.00'), 'Supports partial settlement override amount (am=600.00)');
+
+  // Test 3.5: WhatsApp reminder generation with embedded UPI VPA
+  const waUrl = KhataService.createReminderWhatsAppUrl(testCustomer, mockVendor, 'en');
+  assert(waUrl.startsWith('https://wa.me/'), 'Generates valid wa.me deep link');
+  assert(waUrl.includes('1200'), 'Includes customer totalDue amount in reminder payload');
 }
 
 function runResQEngineTests() {

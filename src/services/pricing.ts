@@ -126,11 +126,21 @@ export class PricingEngine {
   }
 
   /**
-   * Computes the vendor's composite Trust Score (0-100)
-   * Combining:
-   * 1. Pricing Fairness (40%)
-   * 2. Stock Reliability (30%)
-   * 3. Credit Repayment History (30%)
+   * Computes the vendor's composite Trust Score Index (0 - 100).
+   *
+   * ### Mathematical Weighting Model:
+   * $$T_{\text{vendor}} = W_{\text{fairness}} \cdot S_{\text{fairness}} + W_{\text{stock}} \cdot S_{\text{stock}} + W_{\text{khata}} \cdot S_{\text{khata}}$$
+   *
+   * Where:
+   * - **$W_{\text{fairness}} = 0.40$ (40% Weight)**: Evaluates mean absolute Z-score of stall prices against mandi wholesale spread. Penalizes gouging ($Z > 1.8$) by $-6$ pts per occurrence.
+   * - **$W_{\text{stock}} = 0.30$ (30% Weight)**: Measures inventory sell-through efficiency and stockout avoidance based on rolling daily stock logs.
+   * - **$W_{\text{khata}} = 0.30$ (30% Weight)**: Aggregates ledger on-time settlement ratios across all active customers ($\sum (\text{onTimeRatio} \cdot \text{creditLimit}) / \sum \text{creditLimit}$).
+   *
+   * @param vendorPrices Record mapping CommodityType to current selling price in INR
+   * @param mandiRecords Array of current Agmarknet mandi price records
+   * @param stockLogs Array of vendor's rolling daily inventory and wastage logs
+   * @param khataCustomers Array of active customer credit ledger records
+   * @returns Detailed TrustScoreBreakdown containing overall composite score (0-100), sub-scores, and bilingual feedback flags
    */
   public static computeTrustScore(
     vendorPrices: Record<CommodityType, number>,

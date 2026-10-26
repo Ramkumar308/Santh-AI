@@ -11,6 +11,23 @@ interface CachedPayload {
   records: MandiPriceRecord[];
 }
 
+/**
+ * AgmarknetService: Client-side wholesale arrival and mandi price orchestration engine.
+ *
+ * Operational & Resilience Principles:
+ * 1. Strict 8-Second AbortController Timeout:
+ *    To prevent freezing mobile browsers on congested 2G/3G mandi cell towers,
+ *    any network request to data.gov.in or the local proxy is aborted after 8000ms.
+ *
+ * 2. Multi-Tier Cache Fallback Cascade:
+ *    Tier A: Active memory cache (valid within session)
+ *    Tier B: Persistent localStorage cache (`santhai_agmarknet_prices_v1`, 6-hour TTL)
+ *    Tier C: Bundled Tamil Nadu Mandi ground truth extract (`CACHED_TN_MANDI_PRICES`)
+ *
+ * 3. Bilingual Relative Time Formatting:
+ *    Formats elapsed time since price updates in colloquial Tamil (e.g. 'சற்று முன்', '15 நிமிடம் முன்')
+ *    and Indian English ('Just now', '15 mins ago').
+ */
 export class AgmarknetService {
   private static instance: AgmarknetService;
   private hasSucceededInSession: boolean = false;
@@ -23,6 +40,9 @@ export class AgmarknetService {
 
   private constructor() {}
 
+  /**
+   * Returns singleton instance of AgmarknetService.
+   */
   public static getInstance(): AgmarknetService {
     if (!AgmarknetService.instance) {
       AgmarknetService.instance = new AgmarknetService();
@@ -30,6 +50,9 @@ export class AgmarknetService {
     return AgmarknetService.instance;
   }
 
+  /**
+   * Returns current connection status, data source attribution, and update timestamp.
+   */
   public getStatus(): PriceStatus {
     return this.currentStatus;
   }
