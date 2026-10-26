@@ -14,7 +14,8 @@ import {
   X,
   Store,
   Building2,
-  Scale
+  Scale,
+  Terminal
 } from 'lucide-react';
 import { Language, ViewMode, VendorProfile, BgTheme, ResQUserRole, BuyerProfile } from '../types';
 import { DEFAULT_BUYER_PROFILES } from '../services/resqSync';
@@ -44,6 +45,7 @@ interface TopHeaderProps {
   isGoogleConnected?: boolean;
   cloudSyncStatus?: 'idle' | 'syncing' | 'synced' | 'error';
   onOpenFeasibility?: () => void;
+  onOpenReview2Audit?: () => void;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
@@ -68,7 +70,8 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   onChangeActiveBuyer,
   isGoogleConnected = false,
   cloudSyncStatus = 'idle',
-  onOpenFeasibility
+  onOpenFeasibility,
+  onOpenReview2Audit
 }) => {
   const [isThemeOpen, setIsThemeOpen] = useState(false);
 
@@ -318,6 +321,20 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 aria-label="Govt Sources & Field Survey Intelligence"
               >
                 <Scale className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {onOpenReview2Audit && (
+              <button
+                onClick={() => {
+                  SoundEffects.playClick();
+                  onOpenReview2Audit();
+                }}
+                className="p-1.5 rounded-lg text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 transition-colors cursor-pointer"
+                title={lang === 'ta' ? 'மதிப்பாய்வு 2 தொழில்நுட்ப தணிக்கை' : 'Review 2 Technical Audit & 64 Unit Tests'}
+                aria-label="Review 2 Technical Audit"
+              >
+                <Terminal className="w-3.5 h-3.5" />
               </button>
             )}
           </div>

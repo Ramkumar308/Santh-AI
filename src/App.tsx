@@ -38,6 +38,7 @@ import { KhataModule } from './components/KhataModule';
 import { VendorAuthModal } from './components/VendorAuthModal';
 import { DataVaultModal } from './components/DataVaultModal';
 import { MarketDataFeasibilityCenter } from './components/MarketDataFeasibilityCenter';
+import { Review2AuditModal } from './components/Review2AuditModal';
 import { MarketPulseTicker } from './components/MarketPulseTicker';
 import { MarketSessionBanner, MarketSession } from './components/MarketSessionBanner';
 import { ThemePaletteBar } from './components/ThemePaletteBar';
@@ -97,6 +98,7 @@ export default function App() {
   const [vendorProfile, setVendorProfile] = useState<VendorProfile>(AuthService.getCurrentProfile());
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isFeasibilityOpen, setIsFeasibilityOpen] = useState<boolean>(false);
+  const [isReview2AuditOpen, setIsReview2AuditOpen] = useState<boolean>(false);
 
   // Multi-user ResQ Role state: 'vendor' vs 'buyer' (Mess / Hostel)
   const [resqUserRole, setResqUserRole] = useState<ResQUserRole>('vendor');
@@ -640,6 +642,7 @@ export default function App() {
             onToggleOutdoorMode={handleToggleOutdoorMode}
             onOpenDataVault={() => setIsDataVaultOpen(true)}
             onOpenFeasibility={() => setIsFeasibilityOpen(true)}
+            onOpenReview2Audit={() => setIsReview2AuditOpen(true)}
             onRefreshPrices={() => fetchMandiRates(true)}
             isRefreshing={isRefreshingPrices}
             bgTheme={bgTheme}
@@ -1031,6 +1034,17 @@ export default function App() {
         isOpen={isFeasibilityOpen}
         onClose={() => setIsFeasibilityOpen(false)}
         lang={lang}
+      />
+
+      {/* Review 2 Technical Audit & Engineering Specifications Modal */}
+      <Review2AuditModal
+        isOpen={isReview2AuditOpen}
+        onClose={() => setIsReview2AuditOpen(false)}
+        lang={lang}
+        vendorProfile={vendorProfile}
+        khataCustomers={khataCustomers}
+        stockLogs={stockLogs}
+        vendorPrices={vendorPrices}
       />
     </div>
   );
